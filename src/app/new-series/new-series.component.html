@@ -1,0 +1,30 @@
+<div class="content" role="main">
+
+    <div class="card-container">
+
+        <div *ngFor="let series of sortedSeriesList()">
+            <div class="card" >
+
+                <div class="row">
+                    <div>
+                        <img *ngIf="series.image" src="{{series.image.original}}" />
+                    </div>
+
+                    <div class="textStyle col-sm-10">
+                        <div>
+                            <span>{{series.seriesName}}</span>
+                        </div>
+                        <div>
+                            <span>{{series.seriesId}}</span>
+                        </div>
+                        <div>
+                            <span>{{series.summary}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>

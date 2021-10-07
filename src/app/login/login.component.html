@@ -1,0 +1,29 @@
+<div class="col-xs-4 login">
+
+    <div class="form-group">
+        <label class="form-check-label">Login</label>
+    </div>
+    <hr />
+    <div class="form-group">
+        <input type="username" class="form-control" id="username" placeholder="Enter username" #userName />
+    </div>
+    <div class="form-group">
+        <input type="password" class="form-control" id="pass" placeholder="Password" #pass />
+    </div>
+    <div class="form-group">
+        <div class="form-check">
+            <div class="row">
+                <input type="checkbox" class="form-check-input" id="rememberLogin">
+                <label class="form-check-label" for="rememberLogin">Remember me </label>
+            </div>
+        </div>
+    </div>
+
+    <button class=" btn btn-primary" (click)="loginClick()">Login</button>
+
+    <div *ngIf="loginTried" class="row form-group">
+        <div class="col-sm-4">
+            <p class="alert alert-danger">Try Again!</p>
+        </div>
+    </div>
+</div>

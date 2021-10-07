@@ -1,0 +1,43 @@
+.navbar-color {
+    background-color: DodgerBlue;
+    border-color: DodgerBlue;
+}
+.navbar {
+    border-radius: 0px;
+}
+.a-style{
+    float: left;
+    height: 50px;
+    padding: 15px 15px;
+    line-height: 20px;
+    margin-left: -15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.span{
+    color: black;
+}
+.loggedInHeader {
+    float: left;
+    height: 50px;
+    padding: 15px 15px;
+    line-height: 20px;
+    margin-left: -15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.notLoggedInHeader {
+    float: none;
+    height: 50px;
+    padding: 15px 15px;
+    line-height: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+.header {
+    margin-left: auto;
+    margin-right: auto;
+    width: 400px;
+    box-sizing: border-box;
+}

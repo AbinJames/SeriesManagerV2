@@ -1,0 +1,24 @@
+<nav class="navbar navbar-color navbar navbar-expand-lg navbar-light">
+  <div class="container-fluid">
+    <div [ngClass]="{'navbar-header':loginSuccessful, 'header':!loginSuccessful}">
+      <h2 [ngClass]="{'loggedInHeader':loginSuccessful, 'notLoggedInHeader':!loginSuccessful}">Series Manager</h2>
+    </div>
+
+    <div *ngIf="loginSuccessful && sharedDataService.loadedDataCount == sharedDataService.totalDataCount" class="collapse navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active"><a class="nav-link" href="#" [routerLink]="['allseries']">All Series</a></li>
+        <li class="nav-item active"><a class="nav-link" href="#" [routerLink]="['today']">Series Today</a></li>
+        <li class="nav-item"><a class="nav-link" href="newtoday">New Series Today</a></li>
+      </ul>
+      <ul class="navbar-nav my-2 my-lg-0">
+        <li class="dropdown mr-sm-2">
+          <a href="#" class="dropdown-toggle" role="button">Manage <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Logout</a></li>
+          </ul>
+        </li>
+        <li><a href="#" class="my-2 my-sm-0" (click)="onLogoutClick()">Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
