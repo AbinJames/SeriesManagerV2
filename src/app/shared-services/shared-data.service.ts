@@ -8,84 +8,78 @@ import { HttpClient } from "@angular/common/http";
 })
 
 export class SharedDataService {
-    
+
     seriesList: any[] = [];
     seriesDetails: any[] = [];
     seriesDetailsToday: any[] = [];
     seriesImageList: any[] = [];
     newShows: any[] = [];
+    searchedShows: any[] = [];
     noImage: any = "assets/no_image.png";
     yesterday = new Date();
     today = new Date();
     loadedDataCount: number = 0;
-    totalDataCount:number = 1;
+    totalDataCount: number = 1;
+    headersRow: any[] = [];
 
     constructor(private seriesService: SeriesService, private http: HttpClient) { }
 
     getDataRecordsArrayFromCSVFile(csvRecordsArray: any, headerLength: any) {
         let csvArr = [];
-    
+
         for (let i = 1; i < csvRecordsArray.length; i++) {
-          let curruntRecord = (<string>csvRecordsArray[i]).split(',');
-          if (curruntRecord.length == headerLength) {
-            let csvRecord: any = {
-              seriesId: 0,
-              apiId: 0,
-              seriesName: null,
-            };
-            csvRecord.seriesId = curruntRecord[0].trim();
-            csvRecord.apiId = curruntRecord[1].trim();
-            csvRecord.seriesName = curruntRecord[2].trim();
-            csvArr.push(csvRecord);
-          }
+            let curruntRecord = (<string>csvRecordsArray[i]).split(',');
+            if (curruntRecord.length == headerLength) {
+                let csvRecord: any = {
+                    seriesId: 0,
+                    apiId: 0,
+                    seriesName: null,
+                    link: null,
+                };
+                csvRecord.seriesId = curruntRecord[0].trim();
+                csvRecord.apiId = curruntRecord[1].trim();
+                csvRecord.seriesName = curruntRecord[2].trim();
+                csvRecord.link = curruntRecord[3].trim();
+                csvArr.push(csvRecord);
+            }
         }
         return csvArr;
-      }
-    
-      getHeaderArray(csvRecordsArr: any) {
+    }
+
+    getHeaderArray(csvRecordsArr: any) {
         let headers = (<string>csvRecordsArr[0]).split(',');
         let headerArray = [];
         for (let j = 0; j < headers.length; j++) {
-          headerArray.push(headers[j]);
+            headerArray.push(headers[j]);
         }
         return headerArray;
-      }
+    }
 
     initializeSeriesList() {
         this.yesterday.setDate(this.today.getDate() - 1);
         console.log(this.yesterday)
         this.seriesDetails = [];
-        this.http.get('assets/series.csv', {responseType: 'text'})
-        .subscribe(data => {
-            let csvRecordsArray = (<string>data).split(/\r\n|\n/);
-            let headersRow = this.getHeaderArray(csvRecordsArray);
-            this.seriesList = this.getDataRecordsArrayFromCSVFile(csvRecordsArray, headersRow.length);
-            this.totalDataCount = this.seriesList.length;
-            for (let index = 0; index < this.seriesList.length; index++) {
+        this.http.get('assets/series.csv', { responseType: 'text' })
+            .subscribe(data => {
+                let csvRecordsArray = (<string>data).split(/\r\n|\n/);
+                this.headersRow = this.getHeaderArray(csvRecordsArray);
+                this.seriesList = this.getDataRecordsArrayFromCSVFile(csvRecordsArray, this.headersRow.length);
+                this.totalDataCount = this.seriesList.length;
+                for (let index = 0; index < this.seriesList.length; index++) {
 
-                this.seriesService.getShowDetails(this.seriesList[index].apiId).subscribe(response => {
-                    var show = response;
+                    this.seriesService.getShowDetails(this.seriesList[index].apiId).subscribe(response => {
+                        var show = response;
 
-                    this.setShowImage(response["image"], index);
+                        this.setShowImage(response["image"], index);
 
-                    show = this.setShowNextEpisode(show, response["_links"]["nextepisode"]);
+                        show = this.setShowNextEpisode(show, response["_links"]["nextepisode"]);
 
-                    show = this.setShowPreviousEpisode(show, response["_links"]["previousepisode"]);
+                        show = this.setShowPreviousEpisode(show, response["_links"]["previousepisode"]);
 
-                    //     this.seasonToggleClicked[series["id"]] = false;
-                    //     this.wikiToggleClicked[series["id"]] = false;
-                    this.seriesDetails.push(show);
-                });
-            }
-        });
-    }
-
-    showSort() {
-        var seriesWithNextDate = this.seriesDetails.filter(item => item.nextEpisodeAirdate != null);
-        var seriesWithoutNextDate = this.seriesDetails.filter(item => item.nextEpisodeAirdate == null);
-        seriesWithNextDate = seriesWithNextDate.sort((a, b) => (a["nextEpisodeAirdate"] > b["nextEpisodeAirdate"]) ? 1 : -1)
-        this.seriesDetails = [];
-        this.seriesDetails = seriesWithNextDate;
+                        this.seriesDetails.push(show);
+                    });
+                }
+            });
     }
 
     getShowList(): any {
@@ -99,7 +93,10 @@ export class SharedDataService {
     getNewShows(): any {
         this.seriesService.getShowOnDate(this.yesterday).subscribe(shows => {
             for (let index = 0; index < shows.length; index++) {
-                if ( shows[index]["season"] == 1 && shows[index]["number"] == 1) {
+                if (shows[index]["name"] == "Pretty Smart") {
+                    console.log(shows[index]);
+                }
+                if (shows[index]["season"] == 1 && shows[index]["number"] == 1) {
                     this.seriesService.getSeasons(shows[index]["show"]["id"]).subscribe(seasons => {
                         for (let seasonIndex = 0; seasonIndex < seasons.length; seasonIndex++) {
                             if (seasons[seasonIndex]["number"] == shows[index]["season"]) {
@@ -109,7 +106,12 @@ export class SharedDataService {
                                         episodes[0]["seriesId"] = shows[index]["show"]["id"];
                                         episodes[0]["image"] = shows[index]["show"]["image"];
                                         episodes[0]["summary"] = shows[index]["show"]["summary"];
-                                        this.newShows.push(episodes[0]);
+                                        episodes[0]["isAdded"] = false;
+                                        var isAdded = -1;
+                                        isAdded = this.seriesList.findIndex((obj => parseInt(obj.apiId) == shows[index]["show"]["id"]));
+                                        if (isAdded == -1) {
+                                            this.newShows.push(episodes[0]);
+                                        }
                                     }
                                 });
                             }
@@ -119,6 +121,22 @@ export class SharedDataService {
             }
         });
         return this.newShows;
+    }
+
+    searchNewShows(searchText): any {
+        this.seriesService.getShowOnSearch(searchText).subscribe(shows => {
+            for (let index = 0; index < shows.length; index++) {
+                shows[index]["seriesName"] = shows[index]["show"]["name"];
+                shows[index]["seriesId"] = shows[index]["show"]["id"];
+                shows[index]["isAdded"] = false;
+                var isAdded = -1;
+                isAdded = this.seriesList.findIndex((obj => parseInt(obj.apiId) == shows[index]["show"]["id"]));
+                if (isAdded == -1) {
+                    this.searchedShows.push(shows[index]);
+                }
+            }
+        });
+        return this.searchedShows;
     }
 
     getShowImageList(): any {
@@ -207,6 +225,18 @@ export class SharedDataService {
         }
 
         return show;
+    }
+
+    addSeries(series) {
+        this.totalDataCount = this.totalDataCount + 1;
+        let newRecord = {
+            seriesId: this.totalDataCount,
+            apiId: series["seriesId"],
+            seriesName: series["seriesName"],
+            link: ""
+        };
+        this.seriesList.push(newRecord);
+        return this.seriesList;
     }
 
 }

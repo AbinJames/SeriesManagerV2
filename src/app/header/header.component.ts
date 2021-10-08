@@ -9,7 +9,7 @@ import { SharedDataService } from '../shared-services/shared-data.service';
 })
 export class HeaderComponent implements OnInit {
   @Input('loginSuccessful') loginSuccessful = false;
-  constructor(public loginService: LoginService, private sharedDataService : SharedDataService) { }
+  constructor(public loginService: LoginService, public sharedDataService : SharedDataService) { }
 
   ngOnInit() {
   }

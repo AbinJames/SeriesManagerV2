@@ -12,6 +12,7 @@ export class AppComponent {
   loginSuccessful = true;
 
   constructor(public loginService: LoginService, private sharedDataService: SharedDataService) { }
+  
 
   ngOnInit() {
     this.sharedDataService.initializeSeriesList();

@@ -11,6 +11,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { AllShowsListComponent } from './all-shows-list/all-shows-list.component';
 import { TodayShowListComponent } from './today-show-list/today-show-list.component';
 import { NewSeriesComponent } from './new-series/new-series.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Angular2CsvModule } from 'angular2-csv';
 
 @NgModule({
   declarations: [
@@ -26,7 +28,10 @@ import { NewSeriesComponent } from './new-series/new-series.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    FormsModule,
+    ReactiveFormsModule,
+    Angular2CsvModule
   ],
   providers: [],
   bootstrap: [AppComponent]

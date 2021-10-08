@@ -1,30 +1,55 @@
 <div class="content" role="main">
 
+    <form [formGroup]="seriesForm" (ngSubmit)="searchSeries(seriesForm)">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" formControlName="searchText" />
+                </div>
+                <div class="col-sm-2">
+                    <button type="submit">
+                        <span class='fa fa-search'></span>
+                    </button>
+                </div>
+                <angular2csv [data]="data" filename="series" [options]="options"></angular2csv>
+            </div>
+        </div>
+    </form>
+
     <div class="card-container">
-
-        <div *ngFor="let series of sortedSeriesList()">
-            <div class="card" >
-
+        <div *ngFor="let series of sortedNewSeriesList()">
+            <div [ngClass]="{'card' : !series.isAdded, 'cardAdded' : series.isAdded}" (click)="addSeries(series, 1)">
                 <div class="row">
                     <div>
                         <img *ngIf="series.image" src="{{series.image.original}}" />
                     </div>
-
                     <div class="textStyle col-sm-10">
                         <div>
-                            <span>{{series.seriesName}}</span>
+                            <span><b>{{series.seriesName}}</b></span>
                         </div>
-                        <div>
-                            <span>{{series.seriesId}}</span>
-                        </div>
-                        <div>
-                            <span>{{series.summary}}</span>
-                        </div>
+                        <div [innerHTML]="series.summary"></div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
+    <div class="card-container" *ngIf="searchSeries.length != 0">
+        <div *ngFor="let series of sortedSearchSeriesList()">
+            <div [ngClass]="{'card' : !series.isAdded, 'cardAdded' : series.isAdded}" (click)="addSeries(series, 2)">
+                <div class="row">
+                    <div>
+                        <img *ngIf="series.show.image" src="{{series.show.image.original}}" />
+                    </div>
+                    <div class="textStyle col-sm-10">
+                        <div>
+                            <span><b>{{series.show.name}}</b></span>
+                        </div>
+                        <div [innerHTML]="series.show.summary"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>

@@ -48,11 +48,6 @@ export class SeriesService {
       ));
   }
 
-  addNewSeries(data: any): Observable<any[]> {
-    console.log(data);
-    return this.baseService.addData('AddSeries', data);
-  }
-
   getEpisodeDetails(link: any): Observable<any[]> {
     return this.httpClient.get<any>(link).pipe(
       retryWhen(errors =>
@@ -89,27 +84,7 @@ export class SeriesService {
       ));
   }
 
-  getSeries(): Observable<any[]> {
-    //returns list of series from api
-    return this.baseService.getData('GetSeries');
-  }
-
-  deleteSeries(seriesId: any): Observable<any[]> {
-    //returns list of series from api
-    return this.baseService.deleteData(`${'DeleteSeries'}/${seriesId}`);
-  }
-
-  // deleteSeries(seriesId:any): Observable<any[]> {
-  //   //returns list of expense details from api
-  //   return this.baseService.getData(this.baseUrl + `${'DeleteSeries'}/${seriesId}`);
-  //   // return this.http.get<SeriesFull>(`${'http://api.tvmaze.com/singlesearch/shows'}/?q=${name}`);
-  //   //return this.http.get<Episode[]>('http://api.tvmaze.com/shows/'+id+'/episodes');
-  // }
-
   getWikis(searchString: any): Observable<any[]> {
-    var options = {
-      headers: this.baseService.getCommonHeaders()
-    };
     return this.httpClient.get<any>(`${'https://en.wikipedia.org/w/api.php?action=opensearch&format=json&origin=*&search='}${searchString}`).pipe(
       retryWhen(errors =>
         errors.pipe(

@@ -7,7 +7,7 @@ import { SharedDataService } from '../shared-services/shared-data.service';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  constructor(private sharedDataService: SharedDataService) { }
+  constructor(public sharedDataService: SharedDataService) { }
 
   ngOnInit() {
     
