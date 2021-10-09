@@ -12,6 +12,14 @@
   width: 550px;
 }
 
+.search-row{
+  width: 800px !important;
+}
+
+.no-right-padding {
+  padding-right: 0px !important;
+}
+
 img {
   height: 100px;
   margin-right: 8px;

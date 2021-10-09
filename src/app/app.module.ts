@@ -13,6 +13,7 @@ import { TodayShowListComponent } from './today-show-list/today-show-list.compon
 import { NewSeriesComponent } from './new-series/new-series.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Angular2CsvModule } from 'angular2-csv';
+import { ShowDetailsComponent } from './show-details/show-details.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { Angular2CsvModule } from 'angular2-csv';
     LoginComponent,
     AllShowsListComponent,
     TodayShowListComponent,
-    NewSeriesComponent
+    NewSeriesComponent,
+    ShowDetailsComponent
   ],
   imports: [
     BrowserModule,

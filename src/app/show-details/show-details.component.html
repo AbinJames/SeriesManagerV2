@@ -1,0 +1,95 @@
+<div class="content">
+    <div class="row">
+        <div>
+            <img src="{{series.image.original}}" />
+        </div>
+
+        <div class="textStyle col-sm-8">
+            <div>
+                <span>
+                    <h2>{{series.name}}</h2>
+                </span>
+            </div>
+            <div>
+                <span>{{series.status}}</span>
+            </div>
+            <i>
+                <div [innerHTML]="series.summary"></div>
+            </i>
+
+            <ul class="nav nav-tabs">
+                <li class="nav-item" (click)="activateTab(1)">
+                    <a class="nav-link" [ngClass]="{'active' : activeTab == 1}">Wikis</a>
+                </li>
+                <li class="nav-item" (click)="activateTab(2)">
+                    <a class="nav-link" [ngClass]="{'active' : activeTab == 2}">Seasons</a>
+                </li>
+                <li class="nav-item" (click)="activateTab(3)">
+                    <a class="nav-link" [ngClass]="{'active' : activeTab == 3}">Download Links</a>
+                </li>
+            </ul>
+
+            <div *ngIf="series.wiki && activeTab == 1">
+                <table class="table table-bordered table-hover table-sm">
+                    <tr *ngFor="let wiki of series.wiki">
+                        <th><a href="{{wiki}}" target="_blank">{{wiki}}</a></th>
+                    </tr>
+                </table>
+            </div>
+
+            <div *ngIf="series.seasons && activeTab == 2">
+                <ul class="nav nav-pills">
+                    <li class="nav-item" *ngFor="let season of series.seasons.seasonList"
+                        (click)="activateSeasonTab(season.number)">
+                        <a class="nav-link" [ngClass]="{'active' : activeSeasonTab == season.number}">Season
+                            {{season.number}}</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div *ngIf="series.seasons && activeTab == 2 && series['seasons']['season' + activeSeasonTab + 'episodes'].length != 0">
+                <table class="table table-bordered table-hover table-sm">
+                    <tr>
+                        <th>Episode</th>
+                        <th>Name</th>
+                        <th>Airdate</th>
+                    </tr>
+                        <tr *ngFor="let episode of series['seasons']['season' + activeSeasonTab + 'episodes']">
+                            <td *ngIf="!isAired(episode.airdate)"><i>{{episode.number}}</i></td>
+                            <td *ngIf="!isAired(episode.airdate)"><i>{{episode.name}}</i></td>
+                            <td *ngIf="!isAired(episode.airdate)"><i>{{episode.airdate}}</i></td>
+                            <td *ngIf="isAired(episode.airdate)">{{episode.number}}</td>
+                            <td *ngIf="isAired(episode.airdate)">{{episode.name}}</td>
+                            <td *ngIf="isAired(episode.airdate)">{{episode.airdate}}</td>
+                        </tr>
+                </table>
+            </div>
+
+            <div *ngIf="series.seasons && activeTab == 2 && series['seasons']['season' + activeSeasonTab + 'episodes'].length == 0">
+                <i>unlisted</i>
+            </div>
+
+            <div *ngIf="activeTab == 3">
+                <form [formGroup]="showForm" (ngSubmit)="addDownloadLink(showForm)">
+                    <div class="container">
+                        <div class="row search-row">
+                            <div class="col-sm-8 no-right-padding">
+                                <input type="text" class="form-control" formControlName="newLink" placeholder="New Link..."/>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <span class='fa fa-plus'></span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <div *ngIf="series['downloadLinks'].length != 0" class="table-margin">
+                    <table class="table table-bordered table-hover table-sm">
+                        <tr *ngFor="let downloadLink of series['downloadLinks']">
+                            <th><a href="{{downloadLink}}" target="_blank">{{downloadLink}}</a></th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -21,19 +21,6 @@ export class NewSeriesComponent implements OnInit {
     this.seriesForm = this.formBuilder.group({
       searchText: []
     });
-    this.options = {
-      fieldSeparator: ',',
-      quoteStrings: '"',
-      decimalseparator: '.',
-      showLabels: false,
-      headers: this.sharedDataService.headersRow,
-      showTitle: false,
-      title: 'asfasf',
-      useBom: false,
-      removeNewLines: true,
-      keys: [this.sharedDataService.headersRow]
-    };
-    this.data = this.sharedDataService.seriesList;
   }
 
   sortedNewSeriesList() {
@@ -56,19 +43,7 @@ export class NewSeriesComponent implements OnInit {
   }
 
   addSeries(series, list) {
-    this.options = {
-      fieldSeparator: ',',
-      quoteStrings: '"',
-      decimalseparator: '.',
-      showLabels: false,
-      headers: this.sharedDataService.headersRow,
-      showTitle: false,
-      title: '',
-      useBom: false,
-      removeNewLines: true,
-      keys: ['seriesId','apiId','seriesName','link']
-    };
-    this.data = this.sharedDataService.addSeries(series);
+    this.sharedDataService.addSeries(series);
     if(list == 1) {
       var index = this.newShows.findIndex((obj => obj.seriesId == series.seriesId));
       this.newShows[index].isAdded = true;

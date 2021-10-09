@@ -29,4 +29,8 @@ export class AllShowsListComponent implements OnInit {
     return this.seriesDetails;
   }
 
+  openShowDetails(series) {
+    this.sharedDataService.viewDetailsPage(series);
+  }
+
 }

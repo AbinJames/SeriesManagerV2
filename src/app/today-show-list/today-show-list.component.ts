@@ -19,10 +19,14 @@ export class TodayShowListComponent implements OnInit {
   }
 
   sortedSeriesList() {
-    this.seriesDetails.sort(function(a,b){
+    this.seriesDetails.sort(function (a, b) {
       return a.seriesName > b.seriesName ? 1 : -1;
     });
     return this.seriesDetails;
+  }
+
+  openShowDetails(series) {
+    this.sharedDataService.viewDetailsPage(series);
   }
 
 }

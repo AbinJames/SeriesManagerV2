@@ -6,6 +6,7 @@ import { LoginComponent } from './login/login.component';
 import { TodayShowListComponent } from './today-show-list/today-show-list.component';
 import { NewSeriesComponent } from './new-series/new-series.component';
 import { AllShowsListComponent } from './all-shows-list/all-shows-list.component';
+import { ShowDetailsComponent } from './show-details/show-details.component';
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
@@ -13,7 +14,8 @@ const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'allseries', component: AllShowsListComponent },
   { path: 'today', component: TodayShowListComponent },
-  { path: 'newtoday', component: NewSeriesComponent }
+  { path: 'newtoday', component: NewSeriesComponent },
+  { path: 'showdetails/:type', component: ShowDetailsComponent }
 ]
 
 

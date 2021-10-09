@@ -3,7 +3,7 @@
     <div class="card-container">
 
         <div *ngFor="let series of sortedSeriesList()">
-            <div class="card">
+            <div class="card" (click)="openShowDetails(series)">
 
                 <div class="row">
                     <div>

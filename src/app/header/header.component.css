@@ -41,3 +41,25 @@
     width: 400px;
     box-sizing: border-box;
 }
+
+.download-csv {
+    padding-right: 5px;
+}
+
+button {
+    background-color: #ddd;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 5px 5px;
+    transition: 0.3s;
+}
+
+button:hover {
+    background-color: rgb(102, 208, 226);
+}
+
+button.active {
+    background-color: rgb(102, 208, 226)
+}
