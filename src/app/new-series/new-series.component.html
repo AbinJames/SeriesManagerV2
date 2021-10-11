@@ -1,10 +1,10 @@
 <div class="content" role="main">
 
-    <form [formGroup]="seriesForm" (ngSubmit)="searchSeries(seriesForm)">
-        <div class="container">
-            <div class="row">
+    <div class="container">
+        <form [formGroup]="seriesForm" (ngSubmit)="searchSeries(seriesForm)">
+            <div class="row search-row">
                 <div class="col-sm-8 no-right-padding">
-                    <input type="text" class="form-control" formControlName="searchText" placeholder="Search..."/>
+                    <input type="text" class="form-control" formControlName="searchText" placeholder="Search..." />
                 </div>
                 <button type="submit" class="btn btn-primary">
                     <span class='fa fa-search'></span>
@@ -13,8 +13,8 @@
                     <span class='fa fa-refresh'></span>
                 </button>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 
     <div class="card-container" *ngIf="searchShows.length != 0">
         <div *ngFor="let series of sortedSearchSeriesList()">
