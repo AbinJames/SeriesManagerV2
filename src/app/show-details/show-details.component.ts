@@ -58,4 +58,12 @@ export class ShowDetailsComponent implements OnInit {
     this.sharedDataService.addDownloadLink(this.series["seriesId"], showForm.value.newLink);
   }
 
+  deleteShow() {
+    this.sharedDataService.deleteShow(this.series["seriesId"]);
+  }
+
+  closePage() {
+    this.sharedDataService.closeShow(this.series["seriesId"]);
+  }
+
 }

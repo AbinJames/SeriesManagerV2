@@ -47,9 +47,10 @@
 }
 
 button {
-    background-color: #ddd;
+    background-color: dodgerblue;
     float: left;
-    border: none;
+    border: solid 1px darkblue;
+    border-radius: 10%;
     outline: none;
     cursor: pointer;
     padding: 5px 5px;

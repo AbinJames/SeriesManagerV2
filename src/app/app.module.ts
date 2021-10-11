@@ -14,6 +14,8 @@ import { NewSeriesComponent } from './new-series/new-series.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Angular2CsvModule } from 'angular2-csv';
 import { ShowDetailsComponent } from './show-details/show-details.component';
+import { UndeterminedSeriesComponent } from './undetermined-series/undetermined-series.component';
+import { EndedSeriesComponent } from './ended-series/ended-series.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +27,9 @@ import { ShowDetailsComponent } from './show-details/show-details.component';
     AllShowsListComponent,
     TodayShowListComponent,
     NewSeriesComponent,
-    ShowDetailsComponent
+    ShowDetailsComponent,
+    UndeterminedSeriesComponent,
+    EndedSeriesComponent
   ],
   imports: [
     BrowserModule,

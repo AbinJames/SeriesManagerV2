@@ -11,6 +11,9 @@ export class SharedDataService {
     @Output() viewPageClicked = new EventEmitter<any>();
     @Output() changePageClicked = new EventEmitter<any>();
     @Output() csvRefreshed = new EventEmitter<any>();
+    @Output() seriesEnded = new EventEmitter<any>();
+    @Output() initialLoadComplete = new EventEmitter<any>();
+    @Output() closeClicked = new EventEmitter<any>();
 
     seriesList: any[] = [];
     seriesDetails: any[] = [];
@@ -26,6 +29,7 @@ export class SharedDataService {
     headersRow: any[] = [];
     seriesWikiList: any[] = [];
     seriesSeasonsList: any[] = [];
+    distinctDates: any[] = [];
 
     constructor(private seriesService: SeriesService, private http: HttpClient) { }
 
@@ -89,6 +93,9 @@ export class SharedDataService {
             }
             else {
                 show["downloadLinks"] = this.seriesList[index]["link"].split(';');
+            }
+            if (show["status"] == "Ended") {
+                this.seriesEnded.emit(true);
             }
             this.seriesDetails.push(show);
         });
@@ -226,12 +233,27 @@ export class SharedDataService {
                 show["nextEpisodeNumber"] = episode["number"];
                 show["nextEpisodeName"] = episode["name"];
                 show["nextEpisodeAirdate"] = episode["airdate"];
+                var dateIndex = -1;
+                dateIndex = this.distinctDates.findIndex(obj => obj == show["nextEpisodeAirdate"]);
+                if (dateIndex == -1) {
+                    this.distinctDates.push(show["nextEpisodeAirdate"]);
+                    this.distinctDates.sort(function (a, b) {
+                        return +new Date(a) - +new Date(b);
+                    });
+                }
                 show["next"] = "S" + ((Math.floor(episode["season"] / 10) > 0) ? String(episode["season"]) : "0" + String(episode["season"])) + " E" + ((Math.floor(episode["number"] / 10) > 0) ? String(episode["number"]) : "0" + String(episode["number"]));
                 this.loadedDataCount = this.loadedDataCount + 1;
+                if (this.loadedDataCount == this.totalDataCount) {
+                    this.initialLoadComplete.emit();
+                }
             });
         }
         else {
             this.loadedDataCount = this.loadedDataCount + 1;
+        }
+
+        if (this.loadedDataCount == this.totalDataCount) {
+            this.initialLoadComplete.emit();
         }
 
         return show;
@@ -325,6 +347,17 @@ export class SharedDataService {
         else {
             this.seriesList[index]["link"] = this.seriesList[index]["link"] + ";" + downloadLink;
         }
+        this.csvRefreshed.emit(false);
+    }
+
+    closeShow(apiId) {
+        this.closeClicked.emit(apiId);
+    }
+
+    deleteShow(apiId) {
+        var index = this.seriesList.findIndex(obj => obj.apiId == apiId)
+        this.seriesList.splice(index, 1);
+        this.closeClicked.emit(apiId);
         this.csvRefreshed.emit(false);
     }
 
