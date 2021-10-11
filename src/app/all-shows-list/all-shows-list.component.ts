@@ -35,7 +35,7 @@ export class AllShowsListComponent implements OnInit {
   sortedSeriesList() {
     this.seriesDetails.sort(function(a,b){
       if (a.nextEpisodeAirdate === b.nextEpisodeAirdate) {
-          return a.name > b.name ? 1 : -1;
+          return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;
       }
       return  +new Date(a.nextEpisodeAirdate) - +new Date(b.nextEpisodeAirdate);
     });

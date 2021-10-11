@@ -20,7 +20,7 @@ export class EndedSeriesComponent implements OnInit {
 
   sortedSeriesList() {
     this.seriesDetails.sort(function (a, b) {
-      return a.name > b.name ? 1 : -1;
+      return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;
     });
     return this.seriesDetails;
   }

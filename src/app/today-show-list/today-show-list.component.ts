@@ -20,7 +20,7 @@ export class TodayShowListComponent implements OnInit {
 
   sortedSeriesList() {
     this.seriesDetails.sort(function (a, b) {
-      return a.seriesName > b.seriesName ? 1 : -1;
+      return a.seriesName.toLowerCase() > b.seriesName.toLowerCase() ? 1 : -1;
     });
     return this.seriesDetails;
   }

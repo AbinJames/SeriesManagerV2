@@ -14,6 +14,7 @@ export class SharedDataService {
     @Output() seriesEnded = new EventEmitter<any>();
     @Output() initialLoadComplete = new EventEmitter<any>();
     @Output() closeClicked = new EventEmitter<any>();
+    @Output() newShowUnselected = new EventEmitter<any>();
 
     seriesList: any[] = [];
     seriesDetails: any[] = [];
@@ -30,6 +31,7 @@ export class SharedDataService {
     seriesWikiList: any[] = [];
     seriesSeasonsList: any[] = [];
     distinctDates: any[] = [];
+    initialLoadCompleted: boolean = false;
 
     constructor(private seriesService: SeriesService, private http: HttpClient) { }
 
@@ -126,7 +128,11 @@ export class SharedDataService {
                                         var isAdded = -1;
                                         isAdded = this.seriesList.findIndex((obj => parseInt(obj.apiId) == shows[index]["show"]["id"]));
                                         if (isAdded == -1) {
-                                            this.newShows.push(episodes[0]);
+                                            isAdded = -1;
+                                            isAdded = this.newShows.findIndex((obj => parseInt(obj["seriesId"]) == shows[index]["show"]["id"]));
+                                            if (isAdded == -1) {
+                                                this.newShows.push(episodes[0]);
+                                            }
                                         }
                                     }
                                 });
@@ -186,7 +192,7 @@ export class SharedDataService {
                 show["previousEpisodeName"] = prevEpisode["name"];
                 show["previousEpisodeAirdate"] = prevEpisode["airdate"];
                 show["previous"] = "S" + ((Math.floor(prevEpisode["season"] / 10) > 0) ? String(prevEpisode["season"]) : "0" + String(prevEpisode["season"])) + " E" + ((Math.floor(prevEpisode["number"] / 10) > 0) ? String(prevEpisode["number"]) : "0" + String(prevEpisode["number"]));
-                
+
             });
         }
 
@@ -245,8 +251,9 @@ export class SharedDataService {
                 }
                 show["next"] = "S" + ((Math.floor(episode["season"] / 10) > 0) ? String(episode["season"]) : "0" + String(episode["season"])) + " E" + ((Math.floor(episode["number"] / 10) > 0) ? String(episode["number"]) : "0" + String(episode["number"]));
                 this.loadedDataCount = this.loadedDataCount + 1;
-                if (this.loadedDataCount == this.totalDataCount) {
+                if (this.loadedDataCount == this.totalDataCount && !this.initialLoadCompleted) {
                     this.initialLoadComplete.emit();
+                    this.initialLoadCompleted = true;
                 }
             });
         }
@@ -254,8 +261,9 @@ export class SharedDataService {
             this.loadedDataCount = this.loadedDataCount + 1;
         }
 
-        if (this.loadedDataCount == this.totalDataCount) {
+        if (this.loadedDataCount == this.totalDataCount && !this.initialLoadCompleted) {
             this.initialLoadComplete.emit();
+            this.initialLoadCompleted = true;
         }
 
         return show;
@@ -357,8 +365,22 @@ export class SharedDataService {
     }
 
     deleteShow(apiId) {
-        var index = this.seriesList.findIndex(obj => obj.apiId == apiId)
-        this.seriesList.splice(index, 1);
+        var index = -1;
+        index = this.seriesList.findIndex(obj => obj.apiId == apiId)
+        if (index != -1) {
+            this.seriesList.splice(index, 1);
+        }
+        index = -1;
+        index = this.seriesDetails.findIndex(obj => obj.seriesId == apiId);
+        if (index != -1) {
+            this.seriesDetails.splice(index, 1);
+        }
+        index = -1;
+        index = this.seriesDetailsToday.findIndex(obj => obj.seriesId == apiId);
+        if (index != -1) {
+            this.seriesDetailsToday.splice(index, 1);
+        }
+        this.newShowUnselected.emit(apiId);
         this.closeClicked.emit(apiId);
         this.csvRefreshed.emit(false);
     }
