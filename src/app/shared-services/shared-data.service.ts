@@ -185,6 +185,8 @@ export class SharedDataService {
                 show["previousEpisodeNumber"] = prevEpisode["number"];
                 show["previousEpisodeName"] = prevEpisode["name"];
                 show["previousEpisodeAirdate"] = prevEpisode["airdate"];
+                show["previous"] = "S" + ((Math.floor(prevEpisode["season"] / 10) > 0) ? String(prevEpisode["season"]) : "0" + String(prevEpisode["season"])) + " E" + ((Math.floor(prevEpisode["number"] / 10) > 0) ? String(prevEpisode["number"]) : "0" + String(prevEpisode["number"]));
+                
             });
         }
 
