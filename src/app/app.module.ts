@@ -1,4 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -16,6 +17,7 @@ import { Angular2CsvModule } from 'angular2-csv';
 import { ShowDetailsComponent } from './show-details/show-details.component';
 import { UndeterminedSeriesComponent } from './undetermined-series/undetermined-series.component';
 import { EndedSeriesComponent } from './ended-series/ended-series.component';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   declarations: [
@@ -33,11 +35,20 @@ import { EndedSeriesComponent } from './ended-series/ended-series.component';
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    Angular2CsvModule
+    Angular2CsvModule,
+    ToastrModule.forRoot({
+      timeOut: 5000,
+      positionClass: 'toast-bottom-right',
+      preventDuplicates: true,
+      maxOpened: 5,
+      closeButton: true,
+      tapToDismiss: false,
+    })
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -46,21 +46,36 @@
     padding-right: 5px;
 }
 
-button {
+.button-nav {
     background-color: dodgerblue;
-    float: left;
+    float: right;
     border: solid 1px darkblue;
-    border-radius: 10%;
     outline: none;
     cursor: pointer;
     padding: 5px 5px;
     transition: 0.3s;
 }
 
-button:hover {
+.show-details-button {
+    min-width: 100px !important;
+}
+
+.button-nav:hover {
     background-color: rgb(102, 208, 226);
 }
 
-button.active {
+.button-nav.active {
     background-color: rgb(102, 208, 226)
 }
+
+.close-button {
+    border: 0px;
+    float: right;
+    background: inherit;
+}
+
+.scroll {
+    white-space: nowrap;
+    overflow-x: auto; 
+    -webkit-overflow-scrolling: touch;
+  }

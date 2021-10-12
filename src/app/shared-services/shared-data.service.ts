@@ -380,6 +380,14 @@ export class SharedDataService {
         if (index != -1) {
             this.seriesDetailsToday.splice(index, 1);
         }
+        index = -1;
+        index = this.seriesDetails.findIndex(obj => obj["status"] == 'Ended');
+        if (index == -1) {
+            this.seriesEnded.emit(false);
+        }
+        this.loadedDataCount = this.loadedDataCount - 1;
+        this.totalDataCount = this.totalDataCount - 1;
+
         this.newShowUnselected.emit(apiId);
         this.closeClicked.emit(apiId);
         this.csvRefreshed.emit(false);

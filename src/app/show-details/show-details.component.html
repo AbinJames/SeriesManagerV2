@@ -12,9 +12,6 @@
                 <button type="submit" class="btn btn-danger header-row" (click)="deleteShow()">
                     <span class='fa fa-trash'></span>
                 </button>
-                <button type="submit" class="btn btn-primary header-row" (click)="closePage()">
-                    <span class='fa fa-times'></span>
-                </button>
             </div>
             <div>
                 <span>{{series.status}}</span>
@@ -25,25 +22,17 @@
 
             <ul class="nav nav-tabs">
                 <li class="nav-item" (click)="activateTab(1)">
-                    <a class="nav-link" [ngClass]="{'active' : activeTab == 1}">Wikis</a>
+                    <a class="nav-link" [ngClass]="{'active' : activeTab == 1}">Seasons</a>
                 </li>
                 <li class="nav-item" (click)="activateTab(2)">
-                    <a class="nav-link" [ngClass]="{'active' : activeTab == 2}">Seasons</a>
+                    <a class="nav-link" [ngClass]="{'active' : activeTab == 2}">Download Links</a>
                 </li>
                 <li class="nav-item" (click)="activateTab(3)">
-                    <a class="nav-link" [ngClass]="{'active' : activeTab == 3}">Download Links</a>
+                    <a class="nav-link" [ngClass]="{'active' : activeTab == 3}">Wikis</a>
                 </li>
             </ul>
 
-            <div *ngIf="series.wiki && activeTab == 1">
-                <table class="table table-bordered table-hover table-sm">
-                    <tr *ngFor="let wiki of series.wiki">
-                        <th><a href="{{wiki}}" target="_blank">{{wiki}}</a></th>
-                    </tr>
-                </table>
-            </div>
-
-            <div *ngIf="series.seasons && activeTab == 2">
+            <div *ngIf="series.seasons && activeTab == 1">
                 <ul class="nav nav-pills">
                     <li class="nav-item" *ngFor="let season of series.seasons.seasonList"
                         (click)="activateSeasonTab(season.number)">
@@ -53,7 +42,7 @@
                 </ul>
             </div>
 
-            <div *ngIf="series.seasons && activeTab == 2 && series['seasons']['season' + activeSeasonTab + 'episodes'].length != 0">
+            <div *ngIf="series.seasons && activeTab == 1 && series['seasons']['season' + activeSeasonTab + 'episodes'].length != 0">
                 <table class="table table-bordered table-hover table-sm">
                     <tr>
                         <th>Episode</th>
@@ -71,11 +60,11 @@
                 </table>
             </div>
 
-            <div *ngIf="series.seasons && activeTab == 2 && series['seasons']['season' + activeSeasonTab + 'episodes'].length == 0">
+            <div *ngIf="series.seasons && activeTab == 1 && series['seasons']['season' + activeSeasonTab + 'episodes'].length == 0">
                 <i>unlisted</i>
             </div>
 
-            <div *ngIf="activeTab == 3">
+            <div *ngIf="activeTab == 2">
                 <form [formGroup]="showForm" (ngSubmit)="addDownloadLink(showForm)">
                     <div class="container">
                         <div class="row search-row">
@@ -95,6 +84,14 @@
                         </tr>
                     </table>
                 </div>
+            </div>
+
+            <div *ngIf="series.wiki && activeTab == 3">
+                <table class="table table-bordered table-hover table-sm">
+                    <tr *ngFor="let wiki of series.wiki">
+                        <th><a href="{{wiki}}" target="_blank">{{wiki}}</a></th>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
