@@ -12,30 +12,72 @@ import { SharedDataService } from '../shared-services/shared-data.service';
 export class HeaderComponent implements OnInit {
   @Input('loginSuccessful') loginSuccessful = false;
 
-  seriesPageList: any[] = [];
+  tabList: any[] = [];
   activeLink: any = "";
   options: any = null;
   data: any[] = [];
   csvRefreshed: boolean = false;
   isEndedInList: boolean = false;
+  leftCounter: any = 0;
+  rightCounter: any = 0;
 
   constructor(public loginService: LoginService, public sharedDataService: SharedDataService, public router: Router, private toastr: ToastrService) { }
 
   ngOnInit() {
+    var tab = {
+      routerLink: "allseries",
+      tabName: "Series Streaming Now",
+      closeAble: false,
+      series: null
+    }
+    this.tabList.push(tab);
+    tab = {
+      routerLink: "undetermined",
+      tabName: "Undetermined Series",
+      closeAble: false,
+      series: null
+    }
+    this.tabList.push(tab);
+    tab = {
+      routerLink: "today",
+      tabName: "Episodes For Download Today",
+      closeAble: false,
+      series: null
+    }
+    this.tabList.push(tab);
+    tab = {
+      routerLink: "newtoday",
+      tabName: "New Series Today",
+      closeAble: false,
+      series: null
+    }
+    this.tabList.push(tab);
+    this.rightCounter = this.tabList.length;
     this.sharedDataService.viewPageClicked
       .subscribe(
         (series: any) => {
-          series["routerLink"] = 'showdetails/' + series["seriesId"].toString();
+          var tab = {};
+          tab["routerLink"] = 'showdetails/' + series["seriesId"].toString();
           var index = -1;
-          index = this.seriesPageList.findIndex(obj => obj.seriesId == series["seriesId"]);
+          index = this.tabList.findIndex(obj => obj.routerLink == tab["routerLink"]);
           if (index != -1) {
-            this.router.navigate([this.seriesPageList[index]["routerLink"]])
-            this.setActiveLink(this.seriesPageList[index]["seriesName"]);
+            this.router.navigate([this.tabList[index]["routerLink"]])
+            this.setActiveLink(this.tabList[index]["routerLink"]);
           }
-          else if (this.seriesPageList.length < 8) {
-            this.seriesPageList.push(series);
-            this.router.navigate([series["routerLink"]])
-            this.setActiveLink(series["seriesName"]);
+          else if (this.tabList.length < 100) {
+            tab["tabName"] = series["seriesName"];
+            tab["closeAble"] = true;
+            tab["series"] = series;
+            this.tabList.push(tab);
+            this.rightCounter = this.tabList.length;
+            if (this.rightCounter <= 11) {
+              this.leftCounter = 0;
+            }
+            else {
+              this.leftCounter = this.rightCounter - 11
+            }
+            this.router.navigate([tab["routerLink"]])
+            this.setActiveLink(tab["routerLink"]);
           }
           else {
             this.toastr.warning("Maximum tab limit");
@@ -47,6 +89,20 @@ export class HeaderComponent implements OnInit {
       .subscribe(
         (isEndedInList: any) => {
           this.isEndedInList = isEndedInList;
+          if (isEndedInList) {
+            tab = {
+              routerLink: "ended",
+              tabName: "Ended Series",
+              closeAble: false,
+              series: null
+            }
+            this.tabList.splice(2, 0, tab);
+            this.rightCounter++;
+          }
+          else {
+            this.tabList.splice(2, 1);
+            this.rightCounter--;
+          }
         }
       );
     this.sharedDataService.csvRefreshed
@@ -58,28 +114,37 @@ export class HeaderComponent implements OnInit {
     this.sharedDataService.initialLoadComplete
       .subscribe(
         (csvRefreshed: any) => {
-          this.router.navigate(['/allseries'])
+          this.router.navigate(['allseries'])
           this.setActiveLink('allseries');
         }
       );
     this.sharedDataService.closeClicked
       .subscribe(
         (apiId: any) => {
-          var index = this.seriesPageList.findIndex(obj => obj.seriesId == apiId)
-          this.seriesPageList.splice(index, 1);
-          this.router.navigate(['/allseries'])
+          var index = this.tabList.findIndex(obj => obj.series != null && obj.series["seriesId"] == apiId)
+          this.tabList.splice(index, 1);
+          this.leftCounter = 0;
+          if (this.tabList.length > 11) {
+            this.rightCounter = this.leftCounter + 11;
+          }
+          else {
+            this.rightCounter = this.tabList.length;
+          }
+          this.router.navigate(['allseries'])
           this.setActiveLink('allseries');
         }
       );
   }
 
-  setActiveLink(tabName) {
-    this.activeLink = tabName;
+  setActiveLink(tabLink) {
+    this.activeLink = tabLink;
   }
 
-  changePageData(seriesId, tabName) {
-    this.sharedDataService.changeDetailsPage(seriesId);
-    this.activeLink = tabName;
+  changePageData(tab) {
+    if (tab.series != null) {
+      this.sharedDataService.changeDetailsPage(tab.series["seriesId"]);
+    }
+    this.activeLink = tab.routerLink;
   }
 
   refreshCSV() {
@@ -103,17 +168,45 @@ export class HeaderComponent implements OnInit {
     this.loginService.logout();
   }
 
-  nameSizeLimit(seriesName) {
-    var name = seriesName.substr(0, 10);
-    if (seriesName.length <= 10) {
-      return name;
+  nameSizeLimit(tab) {
+    if (tab.closeAble) {
+      var name = tab.tabName.substr(0, 10);
+      if (tab.tabName.length <= 10) {
+        return name;
+      }
+      else {
+        return name + '...';
+      }
     }
-    else {
-      return name + '...';
+    return tab.tabName;
+  }
+
+  closePage(tab) {
+    if (tab.closeAble) {
+      console.log(tab["series"]["seriesId"]);
+      this.sharedDataService.closeShow(tab["series"]["seriesId"]);
     }
   }
 
-  closePage(id) {
-    this.sharedDataService.closeShow(id);
+  tabCounter() {
+    var tabs = []
+    for (let i = this.leftCounter; i < this.rightCounter; i++) {
+      tabs.push(i);
+    }
+    return tabs;
+  }
+
+  moveRight() {
+    if (this.rightCounter != this.tabList.length) {
+      this.rightCounter++;
+      this.leftCounter++;
+    }
+  }
+
+  moveLeft() {
+    if (this.leftCounter != 0) {
+      this.rightCounter--;
+      this.leftCounter--;
+    }
   }
 }

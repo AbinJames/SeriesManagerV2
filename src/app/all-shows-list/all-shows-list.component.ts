@@ -14,13 +14,16 @@ export class AllShowsListComponent implements OnInit {
   distinctDates: any[] = [];
   tomorrow = new Date();
   today = new Date();
+  yesterday = new Date();
 
   constructor(private sharedDataService: SharedDataService) { }
 
   ngOnInit() {
     this.today.setHours(0, 0, 0, 0);
     this.tomorrow.setDate(this.today.getDate() + 1);
+    this.yesterday.setDate(this.today.getDate() - 1);
     this.tomorrow.setHours(0, 0, 0, 0);
+    this.yesterday.setHours(0, 0, 0, 0);
     this.seriesDetails = this.sharedDataService.getShowList();
     this.seriesImageList = this.sharedDataService.getShowImageList();
     this.distinctDates = this.sharedDataService.distinctDates;

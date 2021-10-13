@@ -36,6 +36,18 @@ export class SeriesService {
       ));
   }
 
+  getWebShowOnDate(date: any): Observable<any[]> {
+    return this.httpClient.get<any>(`${'https://api.tvmaze.com/schedule/web?date='}${formatDate(date, 'yyyy-MM-dd', 'en')}`).pipe(
+      retryWhen(errors =>
+        errors.pipe(
+          //log error message
+          tap(val => console.log(val["message"])),
+          //restart in 5 seconds
+          delayWhen(val => timer(1000))
+        )
+      ));
+  }
+
   getShowOnSearch(searchText: any): Observable<any[]> {
     return this.httpClient.get<any>(`${'http://api.tvmaze.com/search/shows?q='}${searchText}`).pipe(
       retryWhen(errors =>

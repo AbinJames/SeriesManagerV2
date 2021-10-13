@@ -14,12 +14,18 @@ export class ShowDetailsComponent implements OnInit {
   constructor(public router: Router, private sharedDataService: SharedDataService, private formBuilder: FormBuilder) { }
 
   series: any = null;
-  activeTab: number = 1;
-  activeSeasonTab: number = 1;
+  activeTab: number = 0;
+  activeSeasonTab: number = 0;
   today = new Date();
   showForm: FormGroup;
 
   ngOnInit(): void {
+    this.series = {
+      image: null,
+      name: "nil",
+      status: "nil",
+      summary: "nil",
+    }
     this.showForm = this.formBuilder.group({
       newLink: ""
     });

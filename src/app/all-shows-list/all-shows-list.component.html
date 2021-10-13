@@ -1,13 +1,17 @@
 <div class="content" role="main">
     <div *ngFor="let date of distinctDates">
         <div class="date" *ngIf="today - getDate(date) == 0">
-            <span >Today</span>
+            <span>Today</span>
+        </div>
+        <div class="date" *ngIf="yesterday - getDate(date) == 0">
+            <span>Yesterday</span>
         </div>
         <div class="date" *ngIf="tomorrow - getDate(date) == 0">
-            <span >Tomorrow</span>
+            <span>Tomorrow</span>
         </div>
-        <div class="date" *ngIf="today - getDate(date) != 0 && tomorrow - getDate(date) != 0">
-            <span >{{date}}</span>
+        <div class="date"
+            *ngIf="today - getDate(date) != 0 && tomorrow - getDate(date) != 0 && yesterday - getDate(date) != 0">
+            <span>{{date}}</span>
         </div>
         <div class="card-container">
 
@@ -32,6 +36,31 @@
 
                             <div>
                                 <span> Next Episode : {{series.next}} - {{series.nextEpisodeName}}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="card"
+                    *ngIf="series.previous && series.previousEpisodeAirdate == date && yesterday - getDate(date) == 0"
+                    (click)="openShowDetails(series)">
+                    <div class="row">
+                        <div>
+                            <img src="{{seriesImageList[series.id]}}" />
+                        </div>
+
+                        <div class="textStyle col-sm-10">
+                            <div>
+                                <span><b>{{series.name}}</b></span>
+                            </div>
+
+                            <div>
+                                <span> Previous Airdate : {{series.previousEpisodeAirdate}}</span>
+                            </div>
+
+                            <div>
+                                <span> Previous Episode : {{series.next}} - {{series.previousEpisodeName}}</span>
                             </div>
                         </div>
                     </div>

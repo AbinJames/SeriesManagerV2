@@ -68,6 +68,8 @@ export class SharedDataService {
 
     initializeSeriesList() {
         this.yesterday.setDate(this.today.getDate() - 1);
+        this.today.setHours(0, 0, 0, 0);
+        this.yesterday.setHours(0, 0, 0, 0);
         this.seriesDetails = [];
         this.http.get('assets/series.csv', { responseType: 'text' })
             .subscribe(data => {
@@ -112,14 +114,16 @@ export class SharedDataService {
     }
 
     getNewShows(): any {
-        this.seriesService.getShowOnDate(this.yesterday).subscribe(shows => {
+        this.seriesService.getShowOnDate(this.today).subscribe(shows => {
             for (let index = 0; index < shows.length; index++) {
-                if (shows[index]["season"] == 1 && shows[index]["number"] == 1) {
+                var premiereDate = new Date(shows[index]["show"]["premiered"]);
+                premiereDate.setHours(0, 0, 0, 0);
+                if (premiereDate == this.today) {
                     this.seriesService.getSeasons(shows[index]["show"]["id"]).subscribe(seasons => {
                         for (let seasonIndex = 0; seasonIndex < seasons.length; seasonIndex++) {
                             if (seasons[seasonIndex]["number"] == shows[index]["season"]) {
                                 this.seriesService.getEpisodes(seasons[seasonIndex]["id"]).subscribe(episodes => {
-                                    if (episodes[0]["airdate"] == formatDate(this.yesterday, 'yyyy-MM-dd', 'en')) {
+                                    if (episodes[0]["airdate"] == formatDate(this.today, 'yyyy-MM-dd', 'en')) {
                                         episodes[0]["seriesName"] = shows[index]["show"]["name"];
                                         episodes[0]["seriesId"] = shows[index]["show"]["id"];
                                         episodes[0]["image"] = shows[index]["show"]["image"];
@@ -130,6 +134,36 @@ export class SharedDataService {
                                         if (isAdded == -1) {
                                             isAdded = -1;
                                             isAdded = this.newShows.findIndex((obj => parseInt(obj["seriesId"]) == shows[index]["show"]["id"]));
+                                            if (isAdded == -1) {
+                                                this.newShows.push(episodes[0]);
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        this.seriesService.getWebShowOnDate(this.today).subscribe(shows => {
+            for (let index = 0; index < shows.length; index++) {
+                if (shows[index]["season"] == 1) {
+                    this.seriesService.getSeasons(shows[index]["_embedded"]["show"]["id"]).subscribe(seasons => {
+                        for (let seasonIndex = 0; seasonIndex < seasons.length; seasonIndex++) {
+                            if (seasons[seasonIndex]["number"] == shows[index]["season"]) {
+                                this.seriesService.getEpisodes(seasons[seasonIndex]["id"]).subscribe(episodes => {
+                                    if (episodes[0]["airdate"] == formatDate(this.today, 'yyyy-MM-dd', 'en')) {
+                                        episodes[0]["seriesName"] = shows[index]["_embedded"]["show"]["name"];
+                                        episodes[0]["seriesId"] = shows[index]["_embedded"]["show"]["id"];
+                                        episodes[0]["image"] = shows[index]["_embedded"]["show"]["image"];
+                                        episodes[0]["summary"] = shows[index]["_embedded"]["show"]["summary"];
+                                        episodes[0]["isAdded"] = false;
+                                        var isAdded = -1;
+                                        isAdded = this.seriesList.findIndex((obj => parseInt(obj.apiId) == shows[index]["_embedded"]["show"]["id"]));
+                                        if (isAdded == -1) {
+                                            isAdded = -1;
+                                            isAdded = this.newShows.findIndex((obj => parseInt(obj["seriesId"]) == shows[index]["_embedded"]["show"]["id"]));
                                             if (isAdded == -1) {
                                                 this.newShows.push(episodes[0]);
                                             }
@@ -217,6 +251,14 @@ export class SharedDataService {
                     episodes[index]["seriesId"] = show["id"];
                     episodes[index]["torrentLink"] = this.setTorrentLink(show["name"], seasonNumber, episodes[index]["number"]);
                     this.seriesDetailsToday.push(episodes[index]);
+                    var dateIndex = -1;
+                    dateIndex = this.distinctDates.findIndex(obj => obj == episodes[index]["airdate"]);
+                    if (dateIndex == -1) {
+                        this.distinctDates.push(episodes[index]["airdate"]);
+                        this.distinctDates.sort(function (a, b) {
+                            return +new Date(a) - +new Date(b);
+                        });
+                    }
                 }
             }
         });

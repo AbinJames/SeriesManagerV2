@@ -5,23 +5,22 @@
     </div>
 
     <div *ngIf="loginSuccessful && sharedDataService.initialLoadCompleted" class="collapse navbar-collapse">
-      <ul class="navbar-nav">
-        <li class="nav-item download-csv"><button class="button-nav" [ngClass]="{'active' : activeLink == 'allseries'}" (click)="setActiveLink('allseries')" [routerLink]="['allseries']">Upcoming Series</button></li>
-        <li class="nav-item download-csv"><button class="button-nav" [ngClass]="{'active' : activeLink == 'undetermined'}" (click)="setActiveLink('undetermined')" [routerLink]="['undetermined']">Undetermind Series</button></li>
-        <li class="nav-item download-csv" *ngIf="isEndedInList"><button class="button-nav" [ngClass]="{'active' : activeLink == 'ended'}" (click)="setActiveLink('ended')" [routerLink]="['ended']">Ended Series</button></li>
-        <li class="nav-item download-csv"><button class="button-nav" [ngClass]="{'active' : activeLink == 'today'}" (click)="setActiveLink('today')" [routerLink]="['today']">Series Today</button></li>
-        <li class="nav-item download-csv"><button class="button-nav" [ngClass]="{'active' : activeLink == 'newtoday'}" (click)="setActiveLink('newtoday')" [routerLink]="['newtoday']">New Series Today</button></li>
-      </ul>
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item download-csv" *ngFor="let series of seriesPageList"><button class=" button-nav show-details-button"
-            [ngClass]="{'active' : activeLink == series.seriesName}" [routerLink]="[series.routerLink]"
-            (click)="changePageData(series.seriesId, series.seriesName)">{{nameSizeLimit(series.seriesName)}}
-            <button class="close-button" (click)="closePage(series.seriesId)">
-              <span class='fa fa-times-circle'></span>
-            </button>
+      <button *ngIf="leftCounter > 0" class="close-button" (click)="moveLeft()">
+        <span class='fa fa-arrow-circle-left'></span>
+      </button>
+      <ul class="navbar-nav mr-auto" *ngIf="tabList.length != 0">
+        <li class="nav-item download-csv" *ngFor="let tabIndex of tabCounter()"><button class=" button-nav show-details-button"
+          [ngClass]="{'active' : activeLink == tabList[tabIndex].routerLink}" [routerLink]="[tabList[tabIndex].routerLink]"
+          (click)="changePageData(tabList[tabIndex])">{{nameSizeLimit(tabList[tabIndex])}}
+          <button *ngIf="tabList[tabIndex].closeAble" class="close-button" (click)="closePage(tabList[tabIndex])">
+            <span class='fa fa-times-circle'></span>
           </button>
-        </li>
+        </button>
+      </li>
       </ul>
+      <button *ngIf="tabList.length > 11 && rightCounter != tabList.length" class="close-button" (click)="moveRight()">
+        <span class='fa fa-arrow-circle-right'></span>
+      </button>
       <ul class="navbar-nav my-2 my-lg-0">
         <li class="download-csv" *ngIf="!csvRefreshed"><button class="button-nav" (click)="refreshCSV()">Refresh CSV</button></li>
         <li class="download-csv" *ngIf="csvRefreshed">
