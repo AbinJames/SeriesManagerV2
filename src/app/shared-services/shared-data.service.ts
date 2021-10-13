@@ -225,8 +225,7 @@ export class SharedDataService {
                 show["previousEpisodeNumber"] = prevEpisode["number"];
                 show["previousEpisodeName"] = prevEpisode["name"];
                 show["previousEpisodeAirdate"] = prevEpisode["airdate"];
-                show["previous"] = "S" + ((Math.floor(prevEpisode["season"] / 10) > 0) ? String(prevEpisode["season"]) : "0" + String(prevEpisode["season"])) + " E" + ((Math.floor(prevEpisode["number"] / 10) > 0) ? String(prevEpisode["number"]) : "0" + String(prevEpisode["number"]));
-
+                show["previous"] = this.getShorthandSE(prevEpisode["season"], prevEpisode["number"]);
             });
         }
 
@@ -267,7 +266,7 @@ export class SharedDataService {
     setTorrentLink(name, season, episode) {
         name = name.replace("'", "");
         name = name.replace("-", "");
-        var searchString = name + " s" + ((Math.floor(season / 10) > 0) ? String(season) : "0" + String(season)) + "e" + ((Math.floor(episode / 10) > 0) ? String(episode) : "0" + String(episode));
+        var searchString = name + " " + this.getShorthandSE(season, episode);
         return `${'https://1337x.to/search/'}/${searchString}/${'/1/'}`;
     }
 
@@ -291,7 +290,7 @@ export class SharedDataService {
                         return +new Date(a) - +new Date(b);
                     });
                 }
-                show["next"] = "S" + ((Math.floor(episode["season"] / 10) > 0) ? String(episode["season"]) : "0" + String(episode["season"])) + " E" + ((Math.floor(episode["number"] / 10) > 0) ? String(episode["number"]) : "0" + String(episode["number"]));
+                show["next"] = this.getShorthandSE(episode["season"], episode["number"]);
                 this.loadedDataCount = this.loadedDataCount + 1;
                 if (this.loadedDataCount == this.totalDataCount && !this.initialLoadCompleted) {
                     this.initialLoadComplete.emit();
@@ -433,6 +432,10 @@ export class SharedDataService {
         this.newShowUnselected.emit(apiId);
         this.closeClicked.emit(apiId);
         this.csvRefreshed.emit(false);
+    }
+
+    getShorthandSE(season, episode) {
+        return "S" + ((Math.floor(season / 10) > 0) ? String(season) : "0" + String(season)) + "E" + ((Math.floor(episode / 10) > 0) ? String(episode) : "0" + String(episode));
     }
 
 }

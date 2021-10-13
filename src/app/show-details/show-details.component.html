@@ -48,14 +48,25 @@
                         <th>Episode</th>
                         <th>Name</th>
                         <th>Airdate</th>
+                        <th>Download</th>
                     </tr>
                         <tr *ngFor="let episode of series['seasons']['season' + activeSeasonTab + 'episodes']">
                             <td *ngIf="!isAired(episode.airdate)"><i>{{episode.number}}</i></td>
                             <td *ngIf="!isAired(episode.airdate)"><i>{{episode.name}}</i></td>
                             <td *ngIf="!isAired(episode.airdate)"><i>{{episode.airdate}}</i></td>
+                            <td *ngIf="!isAired(episode.airdate)">
+                                <button class="btn btn-primary" (click)="openDownloadLink(activeSeasonTab, episode.number)" disabled="true">
+                                    <span class='fa fa-download'></span>
+                                </button>
+                            </td>
                             <td *ngIf="isAired(episode.airdate)">{{episode.number}}</td>
                             <td *ngIf="isAired(episode.airdate)">{{episode.name}}</td>
                             <td *ngIf="isAired(episode.airdate)">{{episode.airdate}}</td>
+                            <td *ngIf="isAired(episode.airdate)"> 
+                                <button class="btn btn-primary" (click)="openDownloadLink(activeSeasonTab, episode.number)">
+                                    <span class='fa fa-download'></span>
+                                </button>
+                            </td>
                         </tr>
                 </table>
             </div>

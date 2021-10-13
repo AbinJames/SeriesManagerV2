@@ -61,8 +61,12 @@ export class HeaderComponent implements OnInit {
           var index = -1;
           index = this.tabList.findIndex(obj => obj.routerLink == tab["routerLink"]);
           if (index != -1) {
-            this.router.navigate([this.tabList[index]["routerLink"]])
-            this.setActiveLink(this.tabList[index]["routerLink"]);
+            if (index + 1 > this.rightCounter) {
+              this.rightCounter = index + 1;
+              this.leftCounter = this.rightCounter - 11;
+            }
+            this.router.navigate([this.tabList[index]["routerLink"]]);
+            this.changePageData(this.tabList[index]);
           }
           else if (this.tabList.length < 100) {
             tab["tabName"] = series["seriesName"];
@@ -77,7 +81,7 @@ export class HeaderComponent implements OnInit {
               this.leftCounter = this.rightCounter - 11
             }
             this.router.navigate([tab["routerLink"]])
-            this.setActiveLink(tab["routerLink"]);
+            this.changePageData(tab);
           }
           else {
             this.toastr.warning("Maximum tab limit");
@@ -121,17 +125,27 @@ export class HeaderComponent implements OnInit {
     this.sharedDataService.closeClicked
       .subscribe(
         (apiId: any) => {
-          var index = this.tabList.findIndex(obj => obj.series != null && obj.series["seriesId"] == apiId)
+          var index = this.tabList.findIndex(obj => obj.series != null && obj.series["seriesId"] == apiId);
+          var isMove = this.activeLink == this.tabList[index].routerLink;
           this.tabList.splice(index, 1);
-          this.leftCounter = 0;
-          if (this.tabList.length > 11) {
-            this.rightCounter = this.leftCounter + 11;
+          if (isMove) {
+            if (this.rightCounter > this.tabList.length) {
+              this.rightCounter--;
+              if (this.rightCounter == this.tabList.length) {
+                this.leftCounter--;
+              }
+            }
+            this.router.navigate([this.tabList[index]["routerLink"]]);
+            this.changePageData(this.tabList[index]);
           }
           else {
-            this.rightCounter = this.tabList.length;
+            if (this.rightCounter > this.tabList.length) {
+              this.rightCounter--;
+              if (this.rightCounter == this.tabList.length) {
+                this.leftCounter--;
+              }
+            }
           }
-          this.router.navigate(['allseries'])
-          this.setActiveLink('allseries');
         }
       );
   }

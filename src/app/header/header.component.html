@@ -9,9 +9,8 @@
         <span class='fa fa-arrow-circle-left'></span>
       </button>
       <ul class="navbar-nav mr-auto" *ngIf="tabList.length != 0">
-        <li class="nav-item download-csv" *ngFor="let tabIndex of tabCounter()"><button class=" button-nav show-details-button"
-          [ngClass]="{'active' : activeLink == tabList[tabIndex].routerLink}" [routerLink]="[tabList[tabIndex].routerLink]"
-          (click)="changePageData(tabList[tabIndex])">{{nameSizeLimit(tabList[tabIndex])}}
+        <li class="nav-item download-csv" *ngFor="let tabIndex of tabCounter(); let i = index;"><button class=" button-nav show-details-button"
+          [ngClass]="{'active' : activeLink == tabList[tabIndex].routerLink}" [routerLink]="[tabList[tabIndex].routerLink]"><span (click)="changePageData(tabList[tabIndex])">{{nameSizeLimit(tabList[tabIndex])}}</span>
           <button *ngIf="tabList[tabIndex].closeAble" class="close-button" (click)="closePage(tabList[tabIndex])">
             <span class='fa fa-times-circle'></span>
           </button>

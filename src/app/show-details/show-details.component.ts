@@ -68,4 +68,9 @@ export class ShowDetailsComponent implements OnInit {
     this.sharedDataService.deleteShow(this.series["seriesId"]);
   }
 
+  openDownloadLink(season, episode) {
+    var url = this.sharedDataService.setTorrentLink(this.series.name, season, episode);
+    window.open(url, '_blank').focus();
+  }
+
 }
