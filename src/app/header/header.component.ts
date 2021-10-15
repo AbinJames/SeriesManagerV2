@@ -20,39 +20,11 @@ export class HeaderComponent implements OnInit {
   isEndedInList: boolean = false;
   leftCounter: any = 0;
   rightCounter: any = 0;
+  tabLimit: any = 7;
 
   constructor(public loginService: LoginService, public sharedDataService: SharedDataService, public router: Router, private toastr: ToastrService) { }
 
   ngOnInit() {
-    var tab = {
-      routerLink: "allseries",
-      tabName: "Series Streaming Now",
-      closeAble: false,
-      series: null
-    }
-    this.tabList.push(tab);
-    tab = {
-      routerLink: "undetermined",
-      tabName: "Undetermined Series",
-      closeAble: false,
-      series: null
-    }
-    this.tabList.push(tab);
-    tab = {
-      routerLink: "today",
-      tabName: "Episodes For Download Today",
-      closeAble: false,
-      series: null
-    }
-    this.tabList.push(tab);
-    tab = {
-      routerLink: "newtoday",
-      tabName: "New Series Today",
-      closeAble: false,
-      series: null
-    }
-    this.tabList.push(tab);
-    this.rightCounter = this.tabList.length;
     this.sharedDataService.viewPageClicked
       .subscribe(
         (series: any) => {
@@ -63,7 +35,7 @@ export class HeaderComponent implements OnInit {
           if (index != -1) {
             if (index + 1 > this.rightCounter) {
               this.rightCounter = index + 1;
-              this.leftCounter = this.rightCounter - 11;
+              this.leftCounter = this.rightCounter - this.tabLimit;
             }
             this.router.navigate([this.tabList[index]["routerLink"]]);
             this.changePageData(this.tabList[index]);
@@ -74,11 +46,11 @@ export class HeaderComponent implements OnInit {
             tab["series"] = series;
             this.tabList.push(tab);
             this.rightCounter = this.tabList.length;
-            if (this.rightCounter <= 11) {
+            if (this.rightCounter <= this.tabLimit) {
               this.leftCounter = 0;
             }
             else {
-              this.leftCounter = this.rightCounter - 11
+              this.leftCounter = this.rightCounter - this.tabLimit
             }
             this.router.navigate([tab["routerLink"]])
             this.changePageData(tab);
@@ -94,18 +66,10 @@ export class HeaderComponent implements OnInit {
         (isEndedInList: any) => {
           this.isEndedInList = isEndedInList;
           if (isEndedInList) {
-            tab = {
-              routerLink: "ended",
-              tabName: "Ended Series",
-              closeAble: false,
-              series: null
-            }
-            this.tabList.splice(2, 0, tab);
-            this.rightCounter++;
+            this.tabLimit = 6;
           }
           else {
-            this.tabList.splice(2, 1);
-            this.rightCounter--;
+            this.tabLimit = 7;
           }
         }
       );
@@ -128,21 +92,33 @@ export class HeaderComponent implements OnInit {
           var index = this.tabList.findIndex(obj => obj.series != null && obj.series["seriesId"] == apiId);
           var isMove = this.activeLink == this.tabList[index].routerLink;
           this.tabList.splice(index, 1);
-          if (isMove) {
-            if (this.rightCounter > this.tabList.length) {
-              this.rightCounter--;
-              if (this.rightCounter == this.tabList.length) {
-                this.leftCounter--;
-              }
-            }
-            this.router.navigate([this.tabList[index]["routerLink"]]);
-            this.changePageData(this.tabList[index]);
+          if (this.tabList.length == 0) {
+            this.router.navigate(['newtoday'])
+            this.setActiveLink('newtoday');
           }
           else {
-            if (this.rightCounter > this.tabList.length) {
-              this.rightCounter--;
-              if (this.rightCounter == this.tabList.length) {
-                this.leftCounter--;
+            if (isMove) {
+              if (this.rightCounter > this.tabList.length) {
+                this.rightCounter--;
+                if (this.rightCounter == this.tabList.length && this.rightCounter > this.tabLimit) {
+                  this.leftCounter--;
+                }
+              }
+              if (index >= this.tabList.length) {
+                this.router.navigate([this.tabList[index - 1]["routerLink"]]);
+                this.changePageData(this.tabList[index - 1]);
+              }
+              else {
+                this.router.navigate([this.tabList[index]["routerLink"]]);
+                this.changePageData(this.tabList[index]);
+              }
+            }
+            else {
+              if (this.rightCounter > this.tabList.length) {
+                this.rightCounter--;
+                if (this.rightCounter == this.tabList.length && this.rightCounter > this.tabLimit) {
+                  this.leftCounter--;
+                }
               }
             }
           }
@@ -184,8 +160,8 @@ export class HeaderComponent implements OnInit {
 
   nameSizeLimit(tab) {
     if (tab.closeAble) {
-      var name = tab.tabName.substr(0, 10);
-      if (tab.tabName.length <= 10) {
+      var name = tab.tabName.substr(0, 9);
+      if (tab.tabName.length <= 9) {
         return name;
       }
       else {
