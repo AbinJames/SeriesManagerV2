@@ -44,6 +44,15 @@ export class ShowDetailsComponent implements OnInit {
       );
   }
 
+  getSeasonList() {
+    this.series.seasons.seasonList.forEach(season => {
+      if (this.activeSeasonTab < season.number) {
+        this.activeSeasonTab = season.number;
+      }
+    });
+    return this.series.seasons.seasonList;
+  }
+
   activateTab(tabId) {
     this.activeTab = tabId;
   }

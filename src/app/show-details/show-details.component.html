@@ -34,7 +34,7 @@
 
             <div *ngIf="series.seasons && activeTab == 1">
                 <ul class="nav nav-pills">
-                    <li class="nav-item" *ngFor="let season of series.seasons.seasonList"
+                    <li class="nav-item" *ngFor="let season of getSeasonList()"
                         (click)="activateSeasonTab(season.number)">
                         <a class="nav-link" [ngClass]="{'active' : activeSeasonTab == season.number}">Season
                             {{season.number}}</a>
