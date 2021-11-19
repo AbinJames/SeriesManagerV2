@@ -1,3 +1,4 @@
+import { getNumberOfCurrencyDigits } from '@angular/common';
 import { isNgTemplate } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
 import { SharedDataService } from '../shared-services/shared-data.service';
@@ -15,6 +16,7 @@ export class AllShowsListComponent implements OnInit {
   tomorrow = new Date();
   today = new Date();
   yesterday = new Date();
+  seriesCount = 0;
 
   constructor(private sharedDataService: SharedDataService) { }
 
@@ -33,6 +35,12 @@ export class AllShowsListComponent implements OnInit {
     var newDate = new Date(date);
     newDate.setHours(0, 0, 0, 0);
     return newDate;
+  }
+
+  getCount() {
+    var res = this.seriesDetails.filter(series => series.next);
+    this.seriesCount = res.length;
+    return this.seriesCount;
   }
 
   sortedSeriesList() {

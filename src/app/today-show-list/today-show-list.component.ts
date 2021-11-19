@@ -10,12 +10,18 @@ export class TodayShowListComponent implements OnInit {
 
   seriesDetails: any[] = [];
   seriesImageList: any[] = [];
+  seriesCount = 0;
 
   constructor(private sharedDataService: SharedDataService) { }
 
   ngOnInit(): void {
     this.seriesDetails = this.sharedDataService.getTodayShowList();
     this.seriesImageList = this.sharedDataService.getShowImageList();
+  }
+
+  getCount() {
+    this.seriesCount = this.seriesDetails.length;
+    return this.seriesCount;
   }
 
   sortedSeriesList() {

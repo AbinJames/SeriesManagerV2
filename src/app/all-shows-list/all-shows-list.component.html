@@ -1,4 +1,7 @@
 <div class="content" role="main">
+    <div>
+        <h4>Series Running : {{getCount()}}</h4>
+    </div>
     <div *ngFor="let date of distinctDates">
         <div class="date" *ngIf="today - getDate(date) == 0">
             <span>Today</span>

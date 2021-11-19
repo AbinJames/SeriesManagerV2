@@ -10,12 +10,19 @@ export class UndeterminedSeriesComponent implements OnInit {
 
   seriesDetails: any[] = [];
   seriesImageList: any[] = [];
+  seriesCount = 0;
 
   constructor(private sharedDataService: SharedDataService) { }
 
   ngOnInit() {
     this.seriesDetails = this.sharedDataService.getShowList();
     this.seriesImageList = this.sharedDataService.getShowImageList();
+  }
+
+  getCount() {
+    var res = this.seriesDetails.filter(series => !series.next && series.status != 'Ended');
+    this.seriesCount = res.length;
+    return this.seriesCount;
   }
 
   sortedSeriesList() {
