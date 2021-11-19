@@ -18,6 +18,7 @@ export class ShowDetailsComponent implements OnInit {
   activeSeasonTab: number = 0;
   today = new Date();
   showForm: FormGroup;
+  isDataLoaded: boolean = false;
 
   ngOnInit(): void {
     this.series = {
@@ -31,25 +32,38 @@ export class ShowDetailsComponent implements OnInit {
     });
     var seriesId = parseInt(this.router.url.toString().replace('/showdetails/', ''));
     this.series = this.sharedDataService.getSeries(seriesId);
-    this.activeTab = 1;
-    this.activeSeasonTab = 1;
 
     this.sharedDataService.changePageClicked
       .subscribe(
         (seriesId: any) => {
           this.series = this.sharedDataService.getSeries(seriesId);
           this.activeTab = 1;
-          this.activeSeasonTab = 1;
+          setTimeout(() => {
+            this.series.seasons.seasonList.forEach(season => {
+              if (this.activeSeasonTab < season.number) {
+                this.activeSeasonTab = season.number;
+              }
+            });
+            this.isDataLoaded = true;
+          }, 2000);
         }
       );
   }
 
+  ngAfterContentInit(): void {
+    this.activeTab = 1;
+    setTimeout(() => {
+      this.series.seasons.seasonList.forEach(season => {
+        if (this.activeSeasonTab < season.number) {
+          this.activeSeasonTab = season.number;
+        }
+      });
+      this.isDataLoaded = true;
+    }, 2000);
+
+  }
+
   getSeasonList() {
-    this.series.seasons.seasonList.forEach(season => {
-      if (this.activeSeasonTab < season.number) {
-        this.activeSeasonTab = season.number;
-      }
-    });
     return this.series.seasons.seasonList;
   }
 
