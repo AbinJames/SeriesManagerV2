@@ -12,6 +12,14 @@
   width: 550px;
 }
 
+form {
+  margin-left: 20px !important;
+}
+
+.form-span {
+  padding-top: 5px;
+}
+
 img {
   height: 100px;
   margin-right: 8px;

@@ -1,13 +1,31 @@
 <div class="content" role="main">
 
+    <div *ngIf="newDate === null || newDate === today">
+        <h4>Episodes for Today : {{getCount()}}</h4>
+    </div>
+
+    <div *ngIf="newDate !== null && newDate !== today">
+        <h4>Episodes for {{showDate}} : {{getCount()}}</h4>
+    </div>
+
     <div>
-        <h4>Episodes Today : {{getCount()}}</h4>
+        <form [formGroup]="dateForm" (ngSubmit)="changeDate(dateForm)">
+            <div class="row">
+                <div class="form-span"><span>Change Date</span></div>
+                <div class="col-sm-8 no-right-padding">
+                    <input type="date" class="form-control" formControlName="newDate" max="{{showTodayDate}}" />
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <span class='fa fa-refresh'></span>
+                </button>
+            </div>
+        </form>
     </div>
 
     <div class="card-container">
 
         <div *ngFor="let series of sortedSeriesList()">
-            <div class="card" (click)="openShowDetails(series)">
+            <div class="card">
 
                 <div class="row">
                     <div>
@@ -23,7 +41,12 @@
                                 {{series.name}}</span>
                         </div>
                         <div>
-                            <a href="{{series.torrentLink}}" target="_blank">Download</a>
+                            <a href="{{series.torrentLink}}" target="_blank">Download Torrent</a>
+                        </div>
+                        <div *ngIf="series.downloadLinks.length != 0">
+                            <div *ngFor="let downloadLink of series.downloadLinks">
+                                <a href="{{downloadLink}}" target="_blank">{{downloadLink}}</a>
+                            </div>
                         </div>
                     </div>
                 </div>

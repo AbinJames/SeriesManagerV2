@@ -67,6 +67,9 @@ export class SharedDataService {
     }
 
     initializeSeriesList() {
+        this.seriesDetailsToday = [];
+        this.seriesDetails = [];
+        this.seriesList = [];
         this.yesterday.setDate(this.today.getDate() - 1);
         this.today.setHours(0, 0, 0, 0);
         this.yesterday.setHours(0, 0, 0, 0);
@@ -89,7 +92,7 @@ export class SharedDataService {
             var show = response;
             this.setShowImage(response["image"], index);
             show = this.setShowNextEpisode(show, response["_links"]["nextepisode"]);
-            show = this.setShowPreviousEpisode(show, response["_links"]["previousepisode"]);
+            show = this.setShowPreviousEpisode(show, response["_links"]["previousepisode"], this.yesterday);
             show["seriesId"] = show["id"];
             show["seriesName"] = show["name"];
             if (this.seriesList[index]["link"] == null || this.seriesList[index]["link"] == "") {
@@ -209,7 +212,7 @@ export class SharedDataService {
         }
     }
 
-    setShowPreviousEpisode(show, previousEpisode): any {
+    setShowPreviousEpisode(show, previousEpisode, previousDate): any {
         show["previousEpisodeSeason"] = null;
         show["previousEpisodeNumber"] = null;
         show["previousEpisodeName"] = null;
@@ -217,9 +220,9 @@ export class SharedDataService {
 
         if (previousEpisode != null) {
             this.seriesService.getEpisodeDetails(previousEpisode["href"]).subscribe(prevEpisode => {
-                if (prevEpisode["airdate"] == formatDate(this.yesterday, 'yyyy-MM-dd', 'en')) {
+                if (prevEpisode["airdate"] == formatDate(previousDate, 'yyyy-MM-dd', 'en')) {
                     show["onDownloadToday"] = true;
-                    this.getCurrentSeason(show["id"], prevEpisode["season"], show);
+                    this.getCurrentSeason(show["id"], prevEpisode["season"], show, previousDate);
                 }
                 show["previousEpisodeSeason"] = prevEpisode["season"];
                 show["previousEpisodeNumber"] = prevEpisode["number"];
@@ -232,31 +235,33 @@ export class SharedDataService {
         return show;
     }
 
-    getCurrentSeason(showId, previousSeason, show) {
+    getCurrentSeason(showId, previousSeason, show, previousDate) {
         this.seriesService.getSeasons(showId).subscribe(seasons => {
             for (let index = 0; index < seasons.length; index++) {
                 if (seasons[index]["number"] == previousSeason) {
-                    this.getCurrentEpisode(seasons[index]["id"], seasons[index]["number"], show);
+                    this.getCurrentEpisode(seasons[index]["id"], seasons[index]["number"], show, previousDate);
                 }
             }
         });
     }
 
-    getCurrentEpisode(seasonId, seasonNumber, show) {
+    getCurrentEpisode(seasonId, seasonNumber, show, previousDate) {
         this.seriesService.getEpisodes(seasonId).subscribe(episodes => {
             for (let index = 0; index < episodes.length; index++) {
-                if (episodes[index]["airdate"] == formatDate(this.yesterday, 'yyyy-MM-dd', 'en')) {
+                if (episodes[index]["airdate"] == formatDate(previousDate, 'yyyy-MM-dd', 'en')) {
                     episodes[index]["seriesName"] = show["name"];
                     episodes[index]["seriesId"] = show["id"];
                     episodes[index]["torrentLink"] = this.setTorrentLink(show["name"], seasonNumber, episodes[index]["number"]);
                     this.seriesDetailsToday.push(episodes[index]);
-                    var dateIndex = -1;
-                    dateIndex = this.distinctDates.findIndex(obj => obj == episodes[index]["airdate"]);
-                    if (dateIndex == -1) {
-                        this.distinctDates.push(episodes[index]["airdate"]);
-                        this.distinctDates.sort(function (a, b) {
-                            return +new Date(a) - +new Date(b);
-                        });
+                    if (previousDate >= this.yesterday) {
+                        var dateIndex = -1;
+                        dateIndex = this.distinctDates.findIndex(obj => obj == episodes[index]["airdate"]);
+                        if (dateIndex == -1) {
+                            this.distinctDates.push(episodes[index]["airdate"]);
+                            this.distinctDates.sort(function (a, b) {
+                                return +new Date(a) - +new Date(b);
+                            });
+                        }
                     }
                 }
             }
@@ -436,6 +441,40 @@ export class SharedDataService {
 
     getShorthandSE(season, episode) {
         return "S" + ((Math.floor(season / 10) > 0) ? String(season) : "0" + String(season)) + "E" + ((Math.floor(episode / 10) > 0) ? String(episode) : "0" + String(episode));
+    }
+
+    changeDate(newDate) {
+        this.seriesDetailsToday = []
+        var dayBefore = new Date();
+        newDate.setDate(newDate.getDate() - 1);
+        newDate.setHours(0, 0, 0, 0);
+        for (let index = 0; index < this.seriesList.length; index++) {
+            this.seriesService.getSeasons(this.seriesList[index].apiId).subscribe(seasons => {
+
+                for (let seasonIndex = 0; seasonIndex < seasons.length; seasonIndex++) {
+                    seasons[seasonIndex]["episodes"] = null;
+                    if (seasons[seasonIndex]["premiereDate"] != null) {
+                        this.seriesService.getEpisodes(seasons[seasonIndex]["id"]).subscribe(episodes => {
+                            for (let episodeIndex = 0; episodeIndex < episodes.length; episodeIndex++) {
+                            if (episodes[episodeIndex]["airdate"] == formatDate(newDate, 'yyyy-MM-dd', 'en')) {
+                                episodes[episodeIndex]["seriesName"] = this.seriesList[index].seriesName;
+                                episodes[episodeIndex]["seriesId"] = this.seriesList[index].apiId;
+                                episodes[episodeIndex]["torrentLink"] = this.setTorrentLink(this.seriesList[index].seriesName, episodes[episodeIndex]["season"], episodes[episodeIndex]["number"]);
+                                if (this.seriesList[index]["link"] == null || this.seriesList[index]["link"] == "") {
+                                    episodes[episodeIndex]["downloadLinks"] = [];
+                                }
+                                else {
+                                    episodes[episodeIndex]["downloadLinks"] = this.seriesList[index]["link"].split(';');
+                                }
+                                this.seriesDetailsToday.push(episodes[episodeIndex]);
+                            }
+                        }
+                        });
+                    }
+
+                }
+            });
+        }
     }
 
 }

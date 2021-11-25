@@ -84,6 +84,18 @@ export class SeriesService {
       ));
   }
 
+  getShowDetailsByDate(apiId: any, episodeDate: any): Observable<any[]> {
+    return this.httpClient.get<any>(`${'http://api.tvmaze.com/shows'}/${apiId}/episodesbydate?date=${episodeDate}`).pipe(
+      retryWhen(errors =>
+        errors.pipe(
+          //log error message
+          tap(val => console.log(val["message"])),
+          //restart in 5 seconds
+          delayWhen(val => timer(1000))
+        )
+      ));
+  }
+
   getSeasons(apiId: any): Observable<any[]> {
     return this.httpClient.get<any>(`${'http://api.tvmaze.com/shows'}/${apiId}/seasons`).pipe(
       retryWhen(errors =>
