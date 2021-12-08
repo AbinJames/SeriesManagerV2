@@ -28,8 +28,12 @@
             <div class="card">
 
                 <div class="row">
-                    <div>
+                    <div *ngIf="seriesImageList[series.seriesId]">
                         <img src="{{seriesImageList[series.seriesId]}}" />
+                    </div>
+
+                    <div *ngIf="!seriesImageList[series.seriesId]">
+                        <img src="../../assets/no-image-available.jpg" />
                     </div>
 
                     <div class="textStyle col-sm-10">
@@ -38,6 +42,10 @@
                         </div>
                         <div *ngIf="series.season && series.number">
                             <span>Season {{series.season}} Episode {{series.number}} -
+                                {{series.name}}</span>
+                        </div>
+                        <div *ngIf="series.season && series.number === null">
+                            <span>Season {{series.season}} Special -
                                 {{series.name}}</span>
                         </div>
                         <div>

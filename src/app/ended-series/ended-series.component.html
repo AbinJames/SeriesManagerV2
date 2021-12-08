@@ -6,8 +6,12 @@
             <div class="card" *ngIf="series.status == 'Ended'" (click)="openShowDetails(series)">
 
                 <div class="row">
-                    <div>
+                    <div  *ngIf="seriesImageList[series.id]">
                         <img src="{{seriesImageList[series.id]}}" />
+                    </div>
+
+                    <div *ngIf="!seriesImageList[series.id]">
+                        <img src="../../assets/no-image-available.jpg" />
                     </div>
 
                     <div class="textStyle col-sm-10">

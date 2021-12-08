@@ -84,7 +84,6 @@ export class SharedDataService {
                     this.addSeriesDetails(index);
                 }
             });
-        this.newShows = this.getNewShows();
     }
 
     addSeriesDetails(index) {
@@ -121,7 +120,7 @@ export class SharedDataService {
             for (let index = 0; index < shows.length; index++) {
                 var premiereDate = new Date(shows[index]["show"]["premiered"]);
                 premiereDate.setHours(0, 0, 0, 0);
-                if (premiereDate == this.today) {
+                if (premiereDate == this.today && (shows[index]["show"]["language"] == 'English' || shows[index]["show"]["language"] == 'Japanese')) {
                     this.seriesService.getSeasons(shows[index]["show"]["id"]).subscribe(seasons => {
                         for (let seasonIndex = 0; seasonIndex < seasons.length; seasonIndex++) {
                             if (seasons[seasonIndex]["number"] == shows[index]["season"]) {
@@ -151,7 +150,7 @@ export class SharedDataService {
         });
         this.seriesService.getWebShowOnDate(this.today).subscribe(shows => {
             for (let index = 0; index < shows.length; index++) {
-                if (shows[index]["season"] == 1) {
+                if (shows[index]["season"] == 1 && (shows[index]["_embedded"]["show"]["language"] == 'English' || shows[index]["_embedded"]["show"]["language"] == 'Japanese')) {
                     this.seriesService.getSeasons(shows[index]["_embedded"]["show"]["id"]).subscribe(seasons => {
                         for (let seasonIndex = 0; seasonIndex < seasons.length; seasonIndex++) {
                             if (seasons[seasonIndex]["number"] == shows[index]["season"]) {
@@ -440,6 +439,10 @@ export class SharedDataService {
     }
 
     getShorthandSE(season, episode) {
+
+        if (episode == null) {
+            return "S" + ((Math.floor(season / 10) > 0) ? String(season) : "0" + String(season)) + " Special";
+        }
         return "S" + ((Math.floor(season / 10) > 0) ? String(season) : "0" + String(season)) + "E" + ((Math.floor(episode / 10) > 0) ? String(episode) : "0" + String(episode));
     }
 

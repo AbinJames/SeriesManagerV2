@@ -1,5 +1,4 @@
-import { getNumberOfCurrencyDigits } from '@angular/common';
-import { isNgTemplate } from '@angular/compiler';
+import { formatDate } from "@angular/common";
 import { Component, OnInit } from '@angular/core';
 import { SharedDataService } from '../shared-services/shared-data.service';
 
@@ -55,6 +54,10 @@ export class AllShowsListComponent implements OnInit {
 
   openShowDetails(series) {
     this.sharedDataService.viewDetailsPage(series);
+  }
+
+  formateDate(date) {
+    return formatDate(date, 'yyyy-MM-dd', 'en');
   }
 
 }

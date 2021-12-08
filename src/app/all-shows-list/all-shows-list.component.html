@@ -4,13 +4,13 @@
     </div>
     <div *ngFor="let date of distinctDates">
         <div class="date" *ngIf="today - getDate(date) == 0">
-            <span>Today</span>
+            <span>Today - {{formateDate(today)}}</span>
         </div>
         <div class="date" *ngIf="yesterday - getDate(date) == 0">
-            <span>Yesterday</span>
+            <span>Yesterday - {{formateDate(yesterday)}}</span>
         </div>
         <div class="date" *ngIf="tomorrow - getDate(date) == 0">
-            <span>Tomorrow</span>
+            <span>Tomorrow - {{formateDate(tomorrow)}}</span>
         </div>
         <div class="date"
             *ngIf="today - getDate(date) != 0 && tomorrow - getDate(date) != 0 && yesterday - getDate(date) != 0">
@@ -20,12 +20,16 @@
 
             <div *ngFor="let series of sortedSeriesList()">
 
-                <div class="card" *ngIf="series.next && series.nextEpisodeAirdate == date"
+                <div class="card" *ngIf="( series.next && series.nextEpisodeAirdate == date ) || ( series.previous && series.previousEpisodeAirdate == date )"
                     (click)="openShowDetails(series)">
 
                     <div class="row">
-                        <div>
+                        <div  *ngIf="seriesImageList[series.id]">
                             <img src="{{seriesImageList[series.id]}}" />
+                        </div>
+    
+                        <div *ngIf="!seriesImageList[series.id]">
+                            <img src="../../assets/no-image-available.jpg" />
                         </div>
 
                         <div class="textStyle col-sm-10">
@@ -33,42 +37,18 @@
                                 <span><b>{{series.name}}</b></span>
                             </div>
 
-                            <div>
-                                <span> Next Airdate : {{series.nextEpisodeAirdate}}</span>
+                            <div *ngIf="series.next && series.nextEpisodeAirdate == date">
+                                <span>{{series.next}} - {{series.nextEpisodeName}}</span>
                             </div>
 
-                            <div>
-                                <span> Next Episode : {{series.next}} - {{series.nextEpisodeName}}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="card"
-                    *ngIf="series.previous && series.previousEpisodeAirdate == date && yesterday - getDate(date) == 0"
-                    (click)="openShowDetails(series)">
-                    <div class="row">
-                        <div>
-                            <img src="{{seriesImageList[series.id]}}" />
-                        </div>
-
-                        <div class="textStyle col-sm-10">
-                            <div>
-                                <span><b>{{series.name}}</b></span>
-                            </div>
-
-                            <div>
-                                <span> Previous Airdate : {{series.previousEpisodeAirdate}}</span>
-                            </div>
-
-                            <div>
-                                <span> Previous Episode : {{series.previous}} - {{series.previousEpisodeName}}</span>
+                            <div *ngIf="series.previous && series.previousEpisodeAirdate == date">
+                                <span>{{series.previous}} - {{series.previousEpisodeName}}</span>
                             </div>
                         </div>
                     </div>
 
                 </div>
+
             </div>
         </div>
 

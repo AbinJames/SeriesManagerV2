@@ -41,6 +41,11 @@
                     <div>
                         <img *ngIf="series.image" src="{{series.image.original}}" />
                     </div>
+
+                    <div *ngIf="!series.image">
+                        <img src="../../assets/no-image-available.jpg" />
+                    </div>
+                    
                     <div class="textStyle col-sm-10">
                         <div>
                             <span><b>{{series.seriesName}}</b></span>
