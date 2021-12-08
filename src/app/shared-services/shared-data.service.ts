@@ -94,6 +94,41 @@ export class SharedDataService {
             show = this.setShowPreviousEpisode(show, response["_links"]["previousepisode"], this.yesterday);
             show["seriesId"] = show["id"];
             show["seriesName"] = show["name"];
+            if (response["_links"]["nextepisode"] && show["status"] != 'Ended') {
+                this.seriesService.getEpisodeDetails(response["_links"]["previousepisode"]["href"]).subscribe(prevEpisode => {
+                    this.seriesService.getSeasons(show["seriesId"]).subscribe(seasons => {
+                        for (let seasonIndex = 0; seasonIndex < seasons.length; seasonIndex++) {
+                            if (seasons[seasonIndex]["premiereDate"] != null && seasons[seasonIndex]["number"] >= prevEpisode["season"]) {
+                                this.seriesService.getEpisodes(seasons[seasonIndex]["id"]).subscribe(episodes => {
+                                    for (let episodeIndex = 0; episodeIndex < episodes.length; episodeIndex++) {
+                                        var airdate = new Date(episodes[episodeIndex]["airdate"]);
+                                        if (airdate >= this.yesterday) {
+                                            if (show[episodes[episodeIndex]["airdate"]]) {
+                                                show[episodes[episodeIndex]["airdate"]].push(episodes[episodeIndex]);
+                                            }
+                                            else {
+                                                show[episodes[episodeIndex]["airdate"]] = [];
+                                                show[episodes[episodeIndex]["airdate"]].push(episodes[episodeIndex]);
+                                            }
+
+                                            var dateIndex = -1;
+                                            dateIndex = this.distinctDates.findIndex(obj => obj == episodes[episodeIndex]["airdate"]);
+                                            if (dateIndex == -1) {
+                                                this.distinctDates.push(episodes[episodeIndex]["airdate"]);
+                                                this.distinctDates.sort(function (a, b) {
+                                                    return +new Date(a) - +new Date(b);
+                                                });
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+
+                        }
+                    });
+                });
+            }
+
             if (this.seriesList[index]["link"] == null || this.seriesList[index]["link"] == "") {
                 show["downloadLinks"] = [];
             }
@@ -252,16 +287,6 @@ export class SharedDataService {
                     episodes[index]["seriesId"] = show["id"];
                     episodes[index]["torrentLink"] = this.setTorrentLink(show["name"], seasonNumber, episodes[index]["number"]);
                     this.seriesDetailsToday.push(episodes[index]);
-                    if (previousDate >= this.yesterday) {
-                        var dateIndex = -1;
-                        dateIndex = this.distinctDates.findIndex(obj => obj == episodes[index]["airdate"]);
-                        if (dateIndex == -1) {
-                            this.distinctDates.push(episodes[index]["airdate"]);
-                            this.distinctDates.sort(function (a, b) {
-                                return +new Date(a) - +new Date(b);
-                            });
-                        }
-                    }
                 }
             }
         });
@@ -286,14 +311,6 @@ export class SharedDataService {
                 show["nextEpisodeNumber"] = episode["number"];
                 show["nextEpisodeName"] = episode["name"];
                 show["nextEpisodeAirdate"] = episode["airdate"];
-                var dateIndex = -1;
-                dateIndex = this.distinctDates.findIndex(obj => obj == show["nextEpisodeAirdate"]);
-                if (dateIndex == -1) {
-                    this.distinctDates.push(show["nextEpisodeAirdate"]);
-                    this.distinctDates.sort(function (a, b) {
-                        return +new Date(a) - +new Date(b);
-                    });
-                }
                 show["next"] = this.getShorthandSE(episode["season"], episode["number"]);
                 this.loadedDataCount = this.loadedDataCount + 1;
                 if (this.loadedDataCount == this.totalDataCount && !this.initialLoadCompleted) {
@@ -459,19 +476,19 @@ export class SharedDataService {
                     if (seasons[seasonIndex]["premiereDate"] != null) {
                         this.seriesService.getEpisodes(seasons[seasonIndex]["id"]).subscribe(episodes => {
                             for (let episodeIndex = 0; episodeIndex < episodes.length; episodeIndex++) {
-                            if (episodes[episodeIndex]["airdate"] == formatDate(newDate, 'yyyy-MM-dd', 'en')) {
-                                episodes[episodeIndex]["seriesName"] = this.seriesList[index].seriesName;
-                                episodes[episodeIndex]["seriesId"] = this.seriesList[index].apiId;
-                                episodes[episodeIndex]["torrentLink"] = this.setTorrentLink(this.seriesList[index].seriesName, episodes[episodeIndex]["season"], episodes[episodeIndex]["number"]);
-                                if (this.seriesList[index]["link"] == null || this.seriesList[index]["link"] == "") {
-                                    episodes[episodeIndex]["downloadLinks"] = [];
+                                if (episodes[episodeIndex]["airdate"] == formatDate(newDate, 'yyyy-MM-dd', 'en')) {
+                                    episodes[episodeIndex]["seriesName"] = this.seriesList[index].seriesName;
+                                    episodes[episodeIndex]["seriesId"] = this.seriesList[index].apiId;
+                                    episodes[episodeIndex]["torrentLink"] = this.setTorrentLink(this.seriesList[index].seriesName, episodes[episodeIndex]["season"], episodes[episodeIndex]["number"]);
+                                    if (this.seriesList[index]["link"] == null || this.seriesList[index]["link"] == "") {
+                                        episodes[episodeIndex]["downloadLinks"] = [];
+                                    }
+                                    else {
+                                        episodes[episodeIndex]["downloadLinks"] = this.seriesList[index]["link"].split(';');
+                                    }
+                                    this.seriesDetailsToday.push(episodes[episodeIndex]);
                                 }
-                                else {
-                                    episodes[episodeIndex]["downloadLinks"] = this.seriesList[index]["link"].split(';');
-                                }
-                                this.seriesDetailsToday.push(episodes[episodeIndex]);
                             }
-                        }
                         });
                     }
 

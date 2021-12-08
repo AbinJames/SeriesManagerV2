@@ -19,35 +19,34 @@
         <div class="card-container">
 
             <div *ngFor="let series of sortedSeriesList()">
+                
+                    <div class="card"
+                        *ngIf="series[date]"
+                        (click)="openShowDetails(series)">
 
-                <div class="card" *ngIf="( series.next && series.nextEpisodeAirdate == date ) || ( series.previous && series.previousEpisodeAirdate == date )"
-                    (click)="openShowDetails(series)">
-
-                    <div class="row">
-                        <div  *ngIf="seriesImageList[series.id]">
-                            <img src="{{seriesImageList[series.id]}}" />
-                        </div>
-    
-                        <div *ngIf="!seriesImageList[series.id]">
-                            <img src="../../assets/no-image-available.jpg" />
-                        </div>
-
-                        <div class="textStyle col-sm-10">
-                            <div>
-                                <span><b>{{series.name}}</b></span>
+                        <div class="row">
+                            <div *ngIf="seriesImageList[series.id]">
+                                <img src="{{seriesImageList[series.id]}}" />
                             </div>
 
-                            <div *ngIf="series.next && series.nextEpisodeAirdate == date">
-                                <span>{{series.next}} - {{series.nextEpisodeName}}</span>
+                            <div *ngIf="!seriesImageList[series.id]">
+                                <img src="../../assets/no-image-available.jpg" />
                             </div>
 
-                            <div *ngIf="series.previous && series.previousEpisodeAirdate == date">
-                                <span>{{series.previous}} - {{series.previousEpisodeName}}</span>
+                            <div class="textStyle col-sm-10">
+                                <div>
+                                    <span><b>{{series.name}}</b></span>
+                                </div>
+
+                                <div *ngFor="let episode of series[date]">
+                                    <span>Season {{episode.season}} Episode {{episode.number}} - {{episode.name}}</span>
+                                </div>
                             </div>
                         </div>
+
                     </div>
 
-                </div>
+
 
             </div>
         </div>
