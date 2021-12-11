@@ -90,12 +90,18 @@ export class SharedDataService {
         this.seriesService.getShowDetails(this.seriesList[index].apiId).subscribe(response => {
             var show = response;
             this.setShowImage(response["image"], index);
-            show = this.setShowNextEpisode(show, response["_links"]["nextepisode"]);
-            show = this.setShowPreviousEpisode(show, response["_links"]["previousepisode"], this.yesterday);
             show["seriesId"] = show["id"];
             show["seriesName"] = show["name"];
-            if (response["_links"]["nextepisode"] && show["status"] != 'Ended') {
-                this.seriesService.getEpisodeDetails(response["_links"]["previousepisode"]["href"]).subscribe(prevEpisode => {
+            show = this.setShowPreviousEpisode(show, response["_links"]["previousepisode"], this.yesterday);
+            if (show["status"] != 'Ended') {
+                var link = null;
+                if (response["_links"]["previousepisode"]) {
+                    link = response["_links"]["previousepisode"]["href"];
+                }
+                else {
+                    link = response["_links"]["nextepisode"]["href"];
+                }
+                this.seriesService.getEpisodeDetails(link).subscribe(prevEpisode => {
                     this.seriesService.getSeasons(show["seriesId"]).subscribe(seasons => {
                         for (let seasonIndex = 0; seasonIndex < seasons.length; seasonIndex++) {
                             if (seasons[seasonIndex]["premiereDate"] != null && seasons[seasonIndex]["number"] >= prevEpisode["season"]) {
@@ -103,6 +109,12 @@ export class SharedDataService {
                                     for (let episodeIndex = 0; episodeIndex < episodes.length; episodeIndex++) {
                                         var airdate = new Date(episodes[episodeIndex]["airdate"]);
                                         if (airdate >= this.yesterday) {
+                                            if (airdate > this.yesterday) {
+                                                show["IsRunning"] = true;
+                                            }
+                                            else {
+                                                show["IsRunning"] = false;
+                                            }
                                             if (show[episodes[episodeIndex]["airdate"]]) {
                                                 show[episodes[episodeIndex]["airdate"]].push(episodes[episodeIndex]);
                                             }
@@ -120,13 +132,36 @@ export class SharedDataService {
                                                 });
                                             }
                                         }
+
+                                        if (seasonIndex == seasons.length - 1 && episodeIndex == episodes.length - 1) {
+                                            this.loadedDataCount = this.loadedDataCount + 1;
+                                            if (this.loadedDataCount == this.totalDataCount && !this.initialLoadCompleted) {
+                                                this.initialLoadComplete.emit();
+                                                this.initialLoadCompleted = true;
+                                            }
+                                        }
                                     }
                                 });
                             }
-
+                            else {
+                                if (seasonIndex == seasons.length - 1) {
+                                    this.loadedDataCount = this.loadedDataCount + 1;
+                                    if (this.loadedDataCount == this.totalDataCount && !this.initialLoadCompleted) {
+                                        this.initialLoadComplete.emit();
+                                        this.initialLoadCompleted = true;
+                                    }
+                                }
+                            }
                         }
                     });
                 });
+            }
+            else {
+                this.loadedDataCount = this.loadedDataCount + 1;
+                if (this.loadedDataCount == this.totalDataCount && !this.initialLoadCompleted) {
+                    this.initialLoadComplete.emit();
+                    this.initialLoadCompleted = true;
+                }
             }
 
             if (this.seriesList[index]["link"] == null || this.seriesList[index]["link"] == "") {
@@ -299,38 +334,6 @@ export class SharedDataService {
         return `${'https://1337x.to/search/'}/${searchString}/${'/1/'}`;
     }
 
-    setShowNextEpisode(show, nextEpisode): any {
-        show["nextEpisodeSeason"] = null;
-        show["nextEpisodeNumber"] = null;
-        show["nextEpisodeName"] = null;
-        show["nextEpisodeAirdate"] = null;
-        show["onDownloadToday"] = false;
-        if (nextEpisode != null) {
-            this.seriesService.getEpisodeDetails(nextEpisode["href"]).subscribe(episode => {
-                show["nextEpisodeSeason"] = episode["season"];
-                show["nextEpisodeNumber"] = episode["number"];
-                show["nextEpisodeName"] = episode["name"];
-                show["nextEpisodeAirdate"] = episode["airdate"];
-                show["next"] = this.getShorthandSE(episode["season"], episode["number"]);
-                this.loadedDataCount = this.loadedDataCount + 1;
-                if (this.loadedDataCount == this.totalDataCount && !this.initialLoadCompleted) {
-                    this.initialLoadComplete.emit();
-                    this.initialLoadCompleted = true;
-                }
-            });
-        }
-        else {
-            this.loadedDataCount = this.loadedDataCount + 1;
-        }
-
-        if (this.loadedDataCount == this.totalDataCount && !this.initialLoadCompleted) {
-            this.initialLoadComplete.emit();
-            this.initialLoadCompleted = true;
-        }
-
-        return show;
-    }
-
     addSeries(series) {
         this.totalDataCount = this.totalDataCount + 1;
         let newRecord = {
@@ -465,7 +468,6 @@ export class SharedDataService {
 
     changeDate(newDate) {
         this.seriesDetailsToday = []
-        var dayBefore = new Date();
         newDate.setDate(newDate.getDate() - 1);
         newDate.setHours(0, 0, 0, 0);
         for (let index = 0; index < this.seriesList.length; index++) {

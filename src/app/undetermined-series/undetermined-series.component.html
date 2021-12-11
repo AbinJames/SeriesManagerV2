@@ -8,7 +8,7 @@
 
         <div *ngFor="let series of sortedSeriesList()">
 
-            <div class="card" *ngIf="!series.next && series.status != 'Ended'" (click)="openShowDetails(series)">
+            <div class="card" *ngIf="!series.IsRunning && series.status != 'Ended'" (click)="openShowDetails(series)">
 
                 <div class="row">
                     <div>

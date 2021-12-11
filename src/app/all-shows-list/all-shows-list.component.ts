@@ -12,10 +12,12 @@ export class AllShowsListComponent implements OnInit {
   seriesDetails: any[] = [];
   seriesImageList: any[] = [];
   distinctDates: any[] = [];
+  filteredSeries: any[] = [];
   tomorrow = new Date();
   today = new Date();
   yesterday = new Date();
   seriesCount = 0;
+  optionSize = 0;
 
   constructor(private sharedDataService: SharedDataService) { }
 
@@ -37,17 +39,17 @@ export class AllShowsListComponent implements OnInit {
   }
 
   getCount() {
-    var res = this.seriesDetails.filter(series => series.next);
+    var res = this.seriesDetails.filter(series => series.IsRunning);
     this.seriesCount = res.length;
     return this.seriesCount;
   }
 
   sortedSeriesList() {
-    this.seriesDetails.sort(function(a,b){
+    this.seriesDetails.sort(function (a, b) {
       if (a.nextEpisodeAirdate === b.nextEpisodeAirdate) {
-          return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;
+        return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;
       }
-      return  +new Date(a.nextEpisodeAirdate) - +new Date(b.nextEpisodeAirdate);
+      return +new Date(a.nextEpisodeAirdate) - +new Date(b.nextEpisodeAirdate);
     });
     return this.seriesDetails;
   }
@@ -58,6 +60,21 @@ export class AllShowsListComponent implements OnInit {
 
   formateDate(date) {
     return formatDate(date, 'yyyy-MM-dd', 'en');
+  }
+
+  showText(value) {
+    if (value.length > 0) {
+      this.filteredSeries = this.seriesDetails.filter(series => series.seriesName.toLowerCase().includes(value.toLowerCase()));
+      if (this.filteredSeries.length > 10) {
+        this.optionSize = 10;
+      }
+      else {
+        this.optionSize = this.filteredSeries.length;
+      }
+    }
+    else {
+      this.filteredSeries = [];
+    }
   }
 
 }

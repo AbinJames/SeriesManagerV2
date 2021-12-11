@@ -2,6 +2,14 @@
     <div>
         <h4>Series Running : {{getCount()}}</h4>
     </div>
+    <div class="select-editable">
+        <input type="text" class="form-control" name="format" id="search" (input)="showText(search.value)" #search/>
+        <select size="10" *ngIf="filteredSeries.length > 0">
+            <ng-container *ngFor="let series of filteredSeries">
+                <option (click)="openShowDetails(series)">{{series.seriesName}}</option>
+            </ng-container>
+        </select>
+    </div>
     <div *ngFor="let date of distinctDates">
         <div class="date" *ngIf="today - getDate(date) == 0">
             <span>Today - {{formateDate(today)}}</span>
@@ -19,32 +27,33 @@
         <div class="card-container">
 
             <div *ngFor="let series of sortedSeriesList()">
-                
-                    <div class="card"
-                        *ngIf="series[date]"
-                        (click)="openShowDetails(series)">
 
-                        <div class="row">
-                            <div *ngIf="seriesImageList[series.id]">
-                                <img src="{{seriesImageList[series.id]}}" />
-                            </div>
+                <div class="card" *ngIf="series[date]" (click)="openShowDetails(series)">
 
-                            <div *ngIf="!seriesImageList[series.id]">
-                                <img src="../../assets/no-image-available.jpg" />
-                            </div>
-
-                            <div class="textStyle col-sm-10">
-                                <div>
-                                    <span><b>{{series.name}}</b></span>
-                                </div>
-
-                                <div *ngFor="let episode of series[date]">
-                                    <span>Season {{episode.season}} Episode {{episode.number}} - {{episode.name}}</span>
-                                </div>
-                            </div>
+                    <div class="row">
+                        <div *ngIf="seriesImageList[series.id]">
+                            <img src="{{seriesImageList[series.id]}}" />
                         </div>
 
+                        <div *ngIf="!seriesImageList[series.id]">
+                            <img src="../../assets/no-image-available.jpg" />
+                        </div>
+
+                        <div class="textStyle col-sm-10">
+                            <div>
+                                <span><b>{{series.name}}</b></span>
+                            </div>
+
+                            <div *ngFor="let episode of series[date]">
+                                <span *ngIf="episode.number">Season {{episode.season}} Episode {{episode.number}} -
+                                    {{episode.name}}</span>
+                                <span *ngIf="!episode.number">Season {{episode.season}} Special Episode -
+                                    {{episode.name}}</span>
+                            </div>
+                        </div>
                     </div>
+
+                </div>
 
 
 

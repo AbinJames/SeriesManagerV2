@@ -20,7 +20,7 @@ export class UndeterminedSeriesComponent implements OnInit {
   }
 
   getCount() {
-    var res = this.seriesDetails.filter(series => !series.next && series.status != 'Ended');
+    var res = this.seriesDetails.filter(series => !series.IsRunning && series.status != 'Ended');
     this.seriesCount = res.length;
     return this.seriesCount;
   }
