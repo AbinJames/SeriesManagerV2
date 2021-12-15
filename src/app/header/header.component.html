@@ -10,7 +10,7 @@
         <li class="nav-item download-csv"><button class="button-nav" [ngClass]="{'active' : activeLink == 'undetermined'}" (click)="setActiveLink('undetermined')" [routerLink]="['undetermined']">Undetermind Series</button></li>
         <li class="nav-item download-csv" *ngIf="isEndedInList"><button class="button-nav" [ngClass]="{'active' : activeLink == 'ended'}" (click)="setActiveLink('ended')" [routerLink]="['ended']">Ended Series</button></li>
         <li class="nav-item download-csv"><button class="button-nav" [ngClass]="{'active' : activeLink == 'today'}" (click)="setActiveLink('today')" [routerLink]="['today']">Episodes For Download Today</button></li>
-        <li class="nav-item download-csv"><button class="button-nav" [ngClass]="{'active' : activeLink == 'newtoday'}" (click)="setActiveLink('newtoday')" [routerLink]="['newtoday']">New Series Today</button></li>
+        <li class="nav-item download-csv"><button class="button-nav" [ngClass]="{'active' : activeLink == 'newtoday'}" (click)="setActiveLink('newtoday')" [routerLink]="['newtoday']">New Series Today <span class="counter counter-lg message-count" *ngIf="newShowsCount != 0"> {{newShowsCount}} </span></button></li>
       </ul>
       <button *ngIf="leftCounter > 0" class="close-button" (click)="moveLeft()">
         <span class='fa fa-arrow-circle-left'></span>

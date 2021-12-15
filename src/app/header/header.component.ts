@@ -21,10 +21,12 @@ export class HeaderComponent implements OnInit {
   leftCounter: any = 0;
   rightCounter: any = 0;
   tabLimit: any = 7;
+  newShowsCount: any = 0;
 
   constructor(public loginService: LoginService, public sharedDataService: SharedDataService, public router: Router, private toastr: ToastrService) { }
 
   ngOnInit() {
+    var series = this.sharedDataService.getNewShows();
     this.sharedDataService.viewPageClicked
       .subscribe(
         (series: any) => {
@@ -84,6 +86,12 @@ export class HeaderComponent implements OnInit {
         (csvRefreshed: any) => {
           this.router.navigate(['allseries'])
           this.setActiveLink('allseries');
+        }
+      );
+      this.sharedDataService.newSeriesLoadComplete
+      .subscribe(
+        (newShowsCount: any) => {
+          this.newShowsCount = newShowsCount;
         }
       );
     this.sharedDataService.closeClicked

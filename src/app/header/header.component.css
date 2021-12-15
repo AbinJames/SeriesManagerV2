@@ -79,3 +79,13 @@
     overflow-x: auto; 
     -webkit-overflow-scrolling: touch;
   }
+
+  .message-count{
+      position: relative;
+      bottom: 15px;
+      border-radius: 150px;
+      padding-left: 5px !important;
+      padding-right: 5px !important;
+      border:rgb(102, 208, 226) solid 1px;
+      background-color: rgb(102, 208, 226);
+  }

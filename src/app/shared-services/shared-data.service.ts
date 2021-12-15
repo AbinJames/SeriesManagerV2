@@ -13,6 +13,7 @@ export class SharedDataService {
     @Output() csvRefreshed = new EventEmitter<any>();
     @Output() seriesEnded = new EventEmitter<any>();
     @Output() initialLoadComplete = new EventEmitter<any>();
+    @Output() newSeriesLoadComplete = new EventEmitter<any>();
     @Output() closeClicked = new EventEmitter<any>();
     @Output() newShowUnselected = new EventEmitter<any>();
 
@@ -208,6 +209,7 @@ export class SharedDataService {
                                             isAdded = this.newShows.findIndex((obj => parseInt(obj["seriesId"]) == shows[index]["show"]["id"]));
                                             if (isAdded == -1) {
                                                 this.newShows.push(episodes[0]);
+                                                this.newSeriesLoadComplete.emit(this.newShows.length);
                                             }
                                         }
                                     }
@@ -238,6 +240,7 @@ export class SharedDataService {
                                             isAdded = this.newShows.findIndex((obj => parseInt(obj["seriesId"]) == shows[index]["_embedded"]["show"]["id"]));
                                             if (isAdded == -1) {
                                                 this.newShows.push(episodes[0]);
+                                                this.newSeriesLoadComplete.emit(this.newShows.length);
                                             }
                                         }
                                     }
@@ -248,6 +251,10 @@ export class SharedDataService {
                 }
             }
         });
+        return this.newShows;
+    }
+
+    getNewShowsList() : any{
         return this.newShows;
     }
 

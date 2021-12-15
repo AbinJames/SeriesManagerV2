@@ -21,7 +21,7 @@ export class NewSeriesComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.newShows = this.sharedDataService.getNewShows();
+    this.newShows = this.sharedDataService.getNewShowsList();
     this.searchShows = this.sharedDataService.searchedShows;
     this.sharedDataService.newShowUnselected
       .subscribe(
