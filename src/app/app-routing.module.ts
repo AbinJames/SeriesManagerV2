@@ -9,12 +9,14 @@ import { AllShowsListComponent } from './all-shows-list/all-shows-list.component
 import { ShowDetailsComponent } from './show-details/show-details.component';
 import { UndeterminedSeriesComponent } from './undetermined-series/undetermined-series.component';
 import { EndedSeriesComponent } from './ended-series/ended-series.component';
+import { AnimeComponent } from './anime/anime.component';
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
   // {path: 'dashboard', canActivate: [AuthGuard], component: DashboardComponent},
   { path: 'dashboard', component: DashboardComponent },
   { path: 'allseries', component: AllShowsListComponent },
+  { path: 'anime', component: AnimeComponent },
   { path: 'undetermined', component: UndeterminedSeriesComponent },
   { path: 'ended', component: EndedSeriesComponent },
   { path: 'today', component: TodayShowListComponent },

@@ -94,7 +94,7 @@ export class SharedDataService {
             show["seriesId"] = show["id"];
             show["seriesName"] = show["name"];
             show = this.setShowPreviousEpisode(show, response["_links"]["previousepisode"], this.yesterday);
-            if (show["status"] != 'Ended') {
+            if (show["status"] != 'Ended' || (show["status"] == 'Ended' && show["ended"] == formatDate(this.yesterday, 'yyyy-MM-dd', 'en')) || (show["status"] == 'Ended' && show["ended"] == formatDate(this.today, 'yyyy-MM-dd', 'en'))) {
                 var link = null;
                 if (response["_links"]["previousepisode"]) {
                     link = response["_links"]["previousepisode"]["href"];
@@ -254,7 +254,7 @@ export class SharedDataService {
         return this.newShows;
     }
 
-    getNewShowsList() : any{
+    getNewShowsList(): any {
         return this.newShows;
     }
 

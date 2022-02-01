@@ -7,6 +7,7 @@
     <div *ngIf="loginSuccessful && sharedDataService.initialLoadCompleted" class="collapse navbar-collapse">
       <ul class="navbar-nav" [ngClass] = "{'mr-auto' : tabList.length == 0}">
         <li class="nav-item download-csv"><button class="button-nav" [ngClass]="{'active' : activeLink == 'allseries'}" (click)="setActiveLink('allseries')" [routerLink]="['allseries']">Series Streaming Now</button></li>
+        <li class="nav-item download-csv"><button class="button-nav" [ngClass]="{'active' : activeLink == 'anime'}" (click)="setActiveLink('anime')" [routerLink]="['anime']">Anime</button></li>
         <li class="nav-item download-csv"><button class="button-nav" [ngClass]="{'active' : activeLink == 'undetermined'}" (click)="setActiveLink('undetermined')" [routerLink]="['undetermined']">Undetermind Series</button></li>
         <li class="nav-item download-csv" *ngIf="isEndedInList"><button class="button-nav" [ngClass]="{'active' : activeLink == 'ended'}" (click)="setActiveLink('ended')" [routerLink]="['ended']">Ended Series</button></li>
         <li class="nav-item download-csv"><button class="button-nav" [ngClass]="{'active' : activeLink == 'today'}" (click)="setActiveLink('today')" [routerLink]="['today']">Episodes For Download Today</button></li>

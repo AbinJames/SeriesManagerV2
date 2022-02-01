@@ -41,7 +41,7 @@
 
                         <div class="textStyle col-sm-10">
                             <div>
-                                <span><b>{{series.name}}</b></span>
+                                <span><b>{{series.name}}</b></span><span *ngIf="series.status == 'Ended'"> ({{series.status}})</span>
                             </div>
 
                             <div *ngFor="let episode of series[date]">

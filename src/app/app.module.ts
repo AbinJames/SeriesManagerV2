@@ -18,6 +18,7 @@ import { ShowDetailsComponent } from './show-details/show-details.component';
 import { UndeterminedSeriesComponent } from './undetermined-series/undetermined-series.component';
 import { EndedSeriesComponent } from './ended-series/ended-series.component';
 import { ToastrModule } from 'ngx-toastr';
+import { AnimeComponent } from './anime/anime.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { ToastrModule } from 'ngx-toastr';
     NewSeriesComponent,
     ShowDetailsComponent,
     UndeterminedSeriesComponent,
-    EndedSeriesComponent
+    EndedSeriesComponent,
+    AnimeComponent
   ],
   imports: [
     BrowserModule,
