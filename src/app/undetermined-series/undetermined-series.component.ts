@@ -9,14 +9,12 @@ import { SharedDataService } from '../shared-services/shared-data.service';
 export class UndeterminedSeriesComponent implements OnInit {
 
   seriesDetails: any[] = [];
-  seriesImageList: any[] = [];
   seriesCount = 0;
 
   constructor(private sharedDataService: SharedDataService) { }
 
   ngOnInit() {
     this.seriesDetails = this.sharedDataService.getShowList();
-    this.seriesImageList = this.sharedDataService.getShowImageList();
   }
 
   getCount() {

@@ -10,7 +10,6 @@ import { SharedDataService } from '../shared-services/shared-data.service';
 export class AllShowsListComponent implements OnInit {
 
   seriesDetails: any[] = [];
-  seriesImageList: any[] = [];
   distinctDates: any[] = [];
   filteredSeries: any[] = [];
   tomorrow = new Date();
@@ -28,8 +27,6 @@ export class AllShowsListComponent implements OnInit {
     this.tomorrow.setHours(0, 0, 0, 0);
     this.yesterday.setHours(0, 0, 0, 0);
     this.seriesDetails = this.sharedDataService.getShowList();
-    // this.seriesDetails = this.seriesDetails.filter(series => series.language === 'Japanese');
-    this.seriesImageList = this.sharedDataService.getShowImageList();
     this.distinctDates = this.sharedDataService.distinctDates;
   }
 

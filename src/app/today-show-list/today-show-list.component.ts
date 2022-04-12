@@ -11,7 +11,6 @@ import { SharedDataService } from '../shared-services/shared-data.service';
 export class TodayShowListComponent implements OnInit {
 
   seriesDetails: any[] = [];
-  seriesImageList: any[] = [];
   seriesCount = 0;
   today = new Date();
   showTodayDate = null;
@@ -33,7 +32,6 @@ export class TodayShowListComponent implements OnInit {
 
   initialiseData(){
     this.seriesDetails = this.sharedDataService.getTodayShowList();
-    this.seriesImageList = this.sharedDataService.getShowImageList();
   }
 
   getCount() {
@@ -45,6 +43,7 @@ export class TodayShowListComponent implements OnInit {
     this.seriesDetails.sort(function (a, b) {
       return a.seriesName.toLowerCase() > b.seriesName.toLowerCase() ? 1 : -1;
     });
+    this.seriesDetails = this.sharedDataService.refreshShowImage(this.seriesDetails);;
     return this.seriesDetails;
   }
 

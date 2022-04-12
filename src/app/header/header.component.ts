@@ -181,7 +181,6 @@ export class HeaderComponent implements OnInit {
 
   closePage(tab) {
     if (tab.closeAble) {
-      console.log(tab["series"]["seriesId"]);
       this.sharedDataService.closeShow(tab["series"]["seriesId"]);
     }
   }

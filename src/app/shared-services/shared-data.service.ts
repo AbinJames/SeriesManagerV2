@@ -20,7 +20,6 @@ export class SharedDataService {
     seriesList: any[] = [];
     seriesDetails: any[] = [];
     seriesDetailsToday: any[] = [];
-    seriesImageList: any[] = [];
     newShows: any[] = [];
     searchedShows: any[] = [];
     noImage: any = "assets/no_image.png";
@@ -33,6 +32,7 @@ export class SharedDataService {
     seriesSeasonsList: any[] = [];
     distinctDates: any[] = [];
     initialLoadCompleted: boolean = false;
+    downloadLinkFromFile: string = 'LinkNotAdded';
 
     constructor(private seriesService: SeriesService, private http: HttpClient) { }
 
@@ -75,106 +75,132 @@ export class SharedDataService {
         this.today.setHours(0, 0, 0, 0);
         this.yesterday.setHours(0, 0, 0, 0);
         this.seriesDetails = [];
-        this.http.get('assets/series.csv', { responseType: 'text' })
+        this.http.get('assets/link.csv', { responseType: 'text' })
             .subscribe(data => {
                 let csvRecordsArray = (<string>data).split(/\r\n|\n/);
-                this.headersRow = this.getHeaderArray(csvRecordsArray);
-                this.seriesList = this.getDataRecordsArrayFromCSVFile(csvRecordsArray, this.headersRow.length);
-                this.totalDataCount = this.seriesList.length;
-                for (let index = 0; index < this.seriesList.length; index++) {
-                    this.addSeriesDetails(index);
-                }
+                this.downloadLinkFromFile = (<string>csvRecordsArray[0]);
+                this.http.get('assets/series.csv', { responseType: 'text' })
+                    .subscribe(data => {
+                        let csvRecordsArray = (<string>data).split(/\r\n|\n/);
+                        this.headersRow = this.getHeaderArray(csvRecordsArray);
+                        this.seriesList = this.getDataRecordsArrayFromCSVFile(csvRecordsArray, this.headersRow.length);
+                        this.totalDataCount = this.seriesList.length;
+                        if (this.seriesList.length == 0) {
+                            this.totalDataCount = 0
+                            this.initialLoadCompleted = true;
+                        }
+                        for (let index = 0; index < this.seriesList.length; index++) {
+                            this.getSeriesDetails(this.seriesList[index].apiId).then(show => {
+                                if (this.seriesList[index]["link"] == null || this.seriesList[index]["link"] == "") {
+                                    show["downloadLinks"] = [];
+                                }
+                                else {
+                                    show["downloadLinks"] = this.seriesList[index]["link"].split(';');
+                                }
+
+                                this.seriesDetails.push(show);
+                            });
+                        }
+                    });
             });
     }
 
-    addSeriesDetails(index) {
-        this.seriesService.getShowDetails(this.seriesList[index].apiId).subscribe(response => {
-            var show = response;
-            this.setShowImage(response["image"], index);
-            show["seriesId"] = show["id"];
-            show["seriesName"] = show["name"];
-            show = this.setShowPreviousEpisode(show, response["_links"]["previousepisode"], this.yesterday);
-            if (show["status"] != 'Ended' || (show["status"] == 'Ended' && show["ended"] == formatDate(this.yesterday, 'yyyy-MM-dd', 'en')) || (show["status"] == 'Ended' && show["ended"] == formatDate(this.today, 'yyyy-MM-dd', 'en'))) {
-                var link = null;
-                if (response["_links"]["previousepisode"]) {
-                    link = response["_links"]["previousepisode"]["href"];
+    getSeriesDetails(apiId): any {
+        return new Promise((resolve, reject) => {
+            this.seriesService.getShowDetails(apiId).subscribe(response => {
+                var show = response;
+                if (response["image"] == null) {
+                    show["image"] = this.noImage;
+                }
+                else if (response["image"]["original"]) {
+                    show["image"] = response["image"]["original"];
+                }
+                else if (response["image"]["medium"]) {
+                    show["image"] = response["image"]["medium"];
                 }
                 else {
-                    link = response["_links"]["nextepisode"]["href"];
+                    show["image"] = this.noImage;
                 }
-                this.seriesService.getEpisodeDetails(link).subscribe(prevEpisode => {
-                    this.seriesService.getSeasons(show["seriesId"]).subscribe(seasons => {
-                        for (let seasonIndex = 0; seasonIndex < seasons.length; seasonIndex++) {
-                            if (seasons[seasonIndex]["premiereDate"] != null && seasons[seasonIndex]["number"] >= prevEpisode["season"]) {
-                                this.seriesService.getEpisodes(seasons[seasonIndex]["id"]).subscribe(episodes => {
-                                    for (let episodeIndex = 0; episodeIndex < episodes.length; episodeIndex++) {
-                                        var airdate = new Date(episodes[episodeIndex]["airdate"]);
-                                        if (airdate >= this.yesterday) {
-                                            if (airdate > this.yesterday) {
-                                                show["IsRunning"] = true;
-                                            }
-                                            else {
-                                                show["IsRunning"] = false;
-                                            }
-                                            if (show[episodes[episodeIndex]["airdate"]]) {
-                                                show[episodes[episodeIndex]["airdate"]].push(episodes[episodeIndex]);
-                                            }
-                                            else {
-                                                show[episodes[episodeIndex]["airdate"]] = [];
-                                                show[episodes[episodeIndex]["airdate"]].push(episodes[episodeIndex]);
+                show["seriesId"] = show["id"];
+                show["seriesName"] = show["name"];
+                show = this.setShowPreviousEpisode(show, response["_links"]["previousepisode"], this.yesterday);
+                if (show["status"] != 'Ended' || (show["status"] == 'Ended' && show["ended"] == formatDate(this.yesterday, 'yyyy-MM-dd', 'en')) || (show["status"] == 'Ended' && show["ended"] == formatDate(this.today, 'yyyy-MM-dd', 'en'))) {
+                    var link = null;
+                    if (response["_links"]["previousepisode"]) {
+                        link = response["_links"]["previousepisode"]["href"];
+                    }
+                    else {
+                        link = response["_links"]["nextepisode"]["href"];
+                    }
+                    this.seriesService.getEpisodeDetails(link).subscribe(prevEpisode => {
+                        this.seriesService.getSeasons(show["seriesId"]).subscribe(seasons => {
+                            for (let seasonIndex = 0; seasonIndex < seasons.length; seasonIndex++) {
+                                if (seasons[seasonIndex]["premiereDate"] != null && seasons[seasonIndex]["number"] >= prevEpisode["season"]) {
+                                    this.seriesService.getEpisodes(seasons[seasonIndex]["id"]).subscribe(episodes => {
+                                        for (let episodeIndex = 0; episodeIndex < episodes.length; episodeIndex++) {
+                                            var airdate = new Date(episodes[episodeIndex]["airdate"]);
+                                            if (airdate >= this.yesterday) {
+                                                if (airdate > this.yesterday) {
+                                                    show["IsRunning"] = true;
+                                                }
+                                                else {
+                                                    show["IsRunning"] = false;
+                                                }
+                                                if (show[episodes[episodeIndex]["airdate"]]) {
+                                                    show[episodes[episodeIndex]["airdate"]].push(episodes[episodeIndex]);
+                                                }
+                                                else {
+                                                    show[episodes[episodeIndex]["airdate"]] = [];
+                                                    show[episodes[episodeIndex]["airdate"]].push(episodes[episodeIndex]);
+                                                }
+
+                                                var dateIndex = -1;
+                                                dateIndex = this.distinctDates.findIndex(obj => obj == episodes[episodeIndex]["airdate"]);
+                                                if (dateIndex == -1) {
+                                                    this.distinctDates.push(episodes[episodeIndex]["airdate"]);
+                                                    this.distinctDates.sort(function (a, b) {
+                                                        return +new Date(a) - +new Date(b);
+                                                    });
+                                                }
                                             }
 
-                                            var dateIndex = -1;
-                                            dateIndex = this.distinctDates.findIndex(obj => obj == episodes[episodeIndex]["airdate"]);
-                                            if (dateIndex == -1) {
-                                                this.distinctDates.push(episodes[episodeIndex]["airdate"]);
-                                                this.distinctDates.sort(function (a, b) {
-                                                    return +new Date(a) - +new Date(b);
-                                                });
+                                            if (seasonIndex == seasons.length - 1 && episodeIndex == episodes.length - 1) {
+                                                this.loadedDataCount = this.loadedDataCount + 1;
+                                                if (this.loadedDataCount == this.totalDataCount && !this.initialLoadCompleted) {
+                                                    this.initialLoadComplete.emit();
+                                                    this.initialLoadCompleted = true;
+                                                }
                                             }
                                         }
-
-                                        if (seasonIndex == seasons.length - 1 && episodeIndex == episodes.length - 1) {
-                                            this.loadedDataCount = this.loadedDataCount + 1;
-                                            if (this.loadedDataCount == this.totalDataCount && !this.initialLoadCompleted) {
-                                                this.initialLoadComplete.emit();
-                                                this.initialLoadCompleted = true;
-                                            }
+                                    });
+                                }
+                                else {
+                                    if (seasonIndex == seasons.length - 1) {
+                                        this.loadedDataCount = this.loadedDataCount + 1;
+                                        if (this.loadedDataCount == this.totalDataCount && !this.initialLoadCompleted) {
+                                            this.initialLoadComplete.emit();
+                                            this.initialLoadCompleted = true;
                                         }
-                                    }
-                                });
-                            }
-                            else {
-                                if (seasonIndex == seasons.length - 1) {
-                                    this.loadedDataCount = this.loadedDataCount + 1;
-                                    if (this.loadedDataCount == this.totalDataCount && !this.initialLoadCompleted) {
-                                        this.initialLoadComplete.emit();
-                                        this.initialLoadCompleted = true;
                                     }
                                 }
                             }
-                        }
+                        });
                     });
-                });
-            }
-            else {
-                this.loadedDataCount = this.loadedDataCount + 1;
-                if (this.loadedDataCount == this.totalDataCount && !this.initialLoadCompleted) {
-                    this.initialLoadComplete.emit();
-                    this.initialLoadCompleted = true;
                 }
-            }
+                else {
+                    this.loadedDataCount = this.loadedDataCount + 1;
+                    if (this.loadedDataCount == this.totalDataCount && !this.initialLoadCompleted) {
+                        this.initialLoadComplete.emit();
+                        this.initialLoadCompleted = true;
+                    }
+                }
 
-            if (this.seriesList[index]["link"] == null || this.seriesList[index]["link"] == "") {
-                show["downloadLinks"] = [];
-            }
-            else {
-                show["downloadLinks"] = this.seriesList[index]["link"].split(';');
-            }
-            if (show["status"] == "Ended") {
-                this.seriesEnded.emit(true);
-            }
-            this.seriesDetails.push(show);
+                if (show["status"] == "Ended") {
+                    this.seriesEnded.emit(true);
+                }
+
+                resolve(show);
+            });
         });
     }
 
@@ -184,6 +210,17 @@ export class SharedDataService {
 
     getTodayShowList(): any {
         return this.seriesDetailsToday;
+    }
+
+    refreshShowImage(seriesList: any): any {
+        for (let index = 0; index < seriesList.length; index++) {
+            let seriesIndex = -1;
+            seriesIndex = this.seriesDetails.findIndex((obj => parseInt(obj.id) == seriesList[index]["seriesId"]));
+            if (seriesIndex != -1) {
+                seriesList[index]["image"] = this.seriesDetails[seriesIndex]["image"];
+            }
+        }
+        return seriesList;
     }
 
     getNewShows(): any {
@@ -275,19 +312,6 @@ export class SharedDataService {
         return this.searchedShows;
     }
 
-    getShowImageList(): any {
-        return this.seriesImageList;
-    }
-
-    setShowImage(image, index) {
-        if (image == null) {
-            this.seriesImageList[this.seriesList[index].apiId] = this.noImage;
-        }
-        else {
-            this.seriesImageList[this.seriesList[index].apiId] = image["medium"];
-        }
-    }
-
     setShowPreviousEpisode(show, previousEpisode, previousDate): any {
         show["previousEpisodeSeason"] = null;
         show["previousEpisodeNumber"] = null;
@@ -327,6 +351,7 @@ export class SharedDataService {
                 if (episodes[index]["airdate"] == formatDate(previousDate, 'yyyy-MM-dd', 'en')) {
                     episodes[index]["seriesName"] = show["name"];
                     episodes[index]["seriesId"] = show["id"];
+                    episodes[index]["image"] = show["image"];
                     episodes[index]["torrentLink"] = this.setTorrentLink(show["name"], seasonNumber, episodes[index]["number"]);
                     this.seriesDetailsToday.push(episodes[index]);
                 }
@@ -338,7 +363,7 @@ export class SharedDataService {
         name = name.replace("'", "");
         name = name.replace("-", "");
         var searchString = name + " " + this.getShorthandSE(season, episode);
-        return `${'https://1337x.to/search/'}/${searchString}/${'/1/'}`;
+        return `${this.downloadLinkFromFile}/${searchString}/${'/1/'}`;
     }
 
     addSeries(series) {
@@ -350,7 +375,10 @@ export class SharedDataService {
             link: ""
         };
         this.seriesList.push(newRecord);
-        this.addSeriesDetails(this.totalDataCount - 1);
+        this.getSeriesDetails(series["seriesId"]).then(show => {
+            show["downloadLinks"] = [];
+            this.seriesDetails.push(show);
+        });
         this.csvRefreshed.emit(false);
     }
 

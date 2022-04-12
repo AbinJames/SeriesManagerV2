@@ -31,11 +31,11 @@
                 <div class="card" *ngIf="series[date]" (click)="openShowDetails(series)">
 
                     <div class="row">
-                        <div *ngIf="seriesImageList[series.id]">
-                            <img src="{{seriesImageList[series.id]}}" />
+                        <div *ngIf="series.image">
+                            <img src="{{series.image}}" />
                         </div>
 
-                        <div *ngIf="!seriesImageList[series.id]">
+                        <div *ngIf="!series.image">
                             <img src="../../assets/no-image-available.jpg" />
                         </div>
 

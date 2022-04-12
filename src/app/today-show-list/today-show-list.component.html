@@ -28,11 +28,11 @@
             <div class="card">
 
                 <div class="row">
-                    <div *ngIf="seriesImageList[series.seriesId]">
-                        <img src="{{seriesImageList[series.seriesId]}}" />
+                    <div *ngIf="series.image">
+                        <img src="{{series.image}}" />
                     </div>
 
-                    <div *ngIf="!seriesImageList[series.seriesId]">
+                    <div *ngIf="!series.image">
                         <img src="../../assets/no-image-available.jpg" />
                     </div>
 

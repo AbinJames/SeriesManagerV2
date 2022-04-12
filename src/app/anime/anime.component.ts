@@ -10,7 +10,6 @@ import { SharedDataService } from '../shared-services/shared-data.service';
 export class AnimeComponent implements OnInit {
 
   seriesDetails: any[] = [];
-  seriesImageList: any[] = [];
   distinctDates: any[] = [];
   filteredSeries: any[] = [];
   tomorrow = new Date();
@@ -23,7 +22,6 @@ export class AnimeComponent implements OnInit {
 
   ngOnInit() {
     this.seriesDetails = this.sharedDataService.getShowList()
-    this.seriesImageList = this.sharedDataService.getShowImageList();
   }
 
   sortedSeriesList() {
