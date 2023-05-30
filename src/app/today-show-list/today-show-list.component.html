@@ -51,7 +51,7 @@
                         <div>
                             <a href="{{series.torrentLink}}" target="_blank">Download Torrent</a>
                         </div>
-                        <div *ngIf="series.downloadLinks.length != 0">
+                        <div *ngIf="series.downloadLinks">
                             <div *ngFor="let downloadLink of series.downloadLinks">
                                 <a href="{{downloadLink}}" target="_blank">{{downloadLink}}</a>
                             </div>

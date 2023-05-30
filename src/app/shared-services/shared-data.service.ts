@@ -361,7 +361,6 @@ export class SharedDataService {
 
     setTorrentLink(name, season, episode) {
         name = name.replace("'", "");
-        name = name.replace("-", "");
         var searchString = name + " " + this.getShorthandSE(season, episode);
         return `${this.downloadLinkFromFile}/${searchString}/${'/1/'}`;
     }
